@@ -1,0 +1,12 @@
+name: NKeconomy
+main: be.noki_senpai.NKeconomy.NKeconomy
+version: 1.0.9
+api-version: 1.14
+author: 'NoKi_senpai'
+description: 'Allows you to have money account'
+website: www.lumen.ovh
+depend: [Vault]
+commands:
+  eco:
+    description: Manages the server economy.
+    usage: /<command> <money|pay|top|give|take|set>

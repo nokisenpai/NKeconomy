@@ -1,0 +1,64 @@
+0:
+  name: Mineur
+  lvl_max: 2000
+  equation_leveling: 2*x
+  equation_exp: 2*x
+  equation_money: 2*x
+  action:
+    BLOCK_BREAK:
+      diamond_ore:
+        base_exp: 10
+        base_money: 10
+      gold_ore:
+        base_exp: 5
+        base_money: 5
+    BLOCK_PLACE:
+      diamond_ore:
+        base_exp: -10
+        base_money: -10
+      gold_ore:
+        base_exp: -5
+        base_money: -5
+1: 
+  name: Pecheur
+  lvl_max: 200
+  equation_leveling: 2*x
+  equation_exp: 2*x
+  equation_money: 2*x
+  action:
+    BLOCK_BREAK:
+      diamond_ore:
+        base_exp: 10
+        base_money: 10
+      gold_ore:
+        base_exp: 5
+        base_money: 5
+    BLOCK_PLACE:
+      diamond_ore:
+        base_exp: -10
+        base_money: -10
+      gold_ore:
+        base_exp: -5
+        base_money: -5
+2: 
+  name: Bucheron
+  lvl_max: 200
+  equation_leveling: 2*x
+  equation_exp: 50+50*x
+  equation_money: 2*x
+  action:
+    BLOCK_BREAK:
+      diamond_ore:
+        base_exp: 10
+        base_money: 10
+      gold_ore:
+        base_exp: 5
+        base_money: 5
+    BLOCK_PLACE:
+      diamond_ore:
+        base_exp: -10
+        base_money: -10
+      gold_ore:
+        base_exp: -5
+        base_money: -5
+  

@@ -1,0 +1,10 @@
+name: NKeconomy
+main: be.noki_senpai.NKeconomy.NKeconomy
+version: 0.0.1
+api-version: 1.13
+author: 'NoKi_senpai'
+description: 'Allows you to have money account and banks'
+depend: [Vault]
+commands:
+  money:
+    description: Main command
