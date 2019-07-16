@@ -7,7 +7,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import be.noki_senpai.NKeconomy.NKeconomy;
-import be.noki_senpai.NKeconomy.data.Players;;
+import be.noki_senpai.NKeconomy.data.Accounts;;
 
 
 
@@ -16,14 +16,14 @@ public class PlayerConnectionListener implements Listener
     @EventHandler
     public void PlayerJoinEvent(final PlayerJoinEvent event) 
     {
-    	NKeconomy.players.putIfAbsent(event.getPlayer().getDisplayName(),new Players(event.getPlayer().getUniqueId()));
+    	NKeconomy.accounts.putIfAbsent(event.getPlayer().getDisplayName(),new Accounts(event.getPlayer().getUniqueId()));
     }
 
     @EventHandler
     public void onPlayerQuitEvent(final PlayerQuitEvent event) 
     {	
-    	NKeconomy.players.get(Bukkit.getOfflinePlayer(event.getPlayer().getUniqueId()).getName()).save();
-    	NKeconomy.players.remove(Bukkit.getOfflinePlayer(event.getPlayer().getUniqueId()).getName());
+    	NKeconomy.accounts.get(Bukkit.getOfflinePlayer(event.getPlayer().getUniqueId()).getName()).save();
+    	NKeconomy.accounts.remove(Bukkit.getOfflinePlayer(event.getPlayer().getUniqueId()).getName());
     }
 
     /*@EventHandler

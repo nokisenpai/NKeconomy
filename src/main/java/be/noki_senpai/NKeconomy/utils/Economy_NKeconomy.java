@@ -14,7 +14,6 @@ import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 
 import be.noki_senpai.NKeconomy.NKeconomy;
-import be.noki_senpai.NKeconomy.data.Players;
 import net.milkbowl.vault.economy.AbstractEconomy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import net.milkbowl.vault.economy.EconomyResponse.ResponseType;
@@ -105,9 +104,12 @@ public class Economy_NKeconomy extends AbstractEconomy
         return name;
     }
 
+    
+    
     //####################################
-    //Simple account
+    // Simple account
     //####################################
+    
     @Override
     public double getBalance(String playerName) 
     {
@@ -115,7 +117,7 @@ public class Economy_NKeconomy extends AbstractEconomy
 
         try 
         {
-        	balance = Players.getBalance(playerName);
+        	balance = NKeconomy.getBalance(playerName);
         } 
         catch (Exception e) 
         {
@@ -187,7 +189,7 @@ public class Economy_NKeconomy extends AbstractEconomy
     @Override
     public boolean hasAccount(String playerName) 
     {
-        return Players.hasAccount(playerName);
+        return NKeconomy.hasAccount(playerName);
     }
     
     @Override
@@ -201,9 +203,12 @@ public class Economy_NKeconomy extends AbstractEconomy
     	return false;
     }
     
+    
+    
     //####################################
-    //Currency & format
+    // Currency & format
     //####################################
+    
     @Override
     public String format(double amount) 
     {
@@ -229,7 +234,7 @@ public class Economy_NKeconomy extends AbstractEconomy
 	}
 
     //####################################
-    //Bank (not implemented)
+    // Bank (not implemented)
     //####################################
     @Override
     public EconomyResponse createBank(String name, String player) 
@@ -292,7 +297,7 @@ public class Economy_NKeconomy extends AbstractEconomy
     }
 	
 	//####################################
-    //World support account (not implemented)
+    // World support account (not implemented)
     //####################################
     @Override
     public boolean hasAccount(String playerName, String worldName) 

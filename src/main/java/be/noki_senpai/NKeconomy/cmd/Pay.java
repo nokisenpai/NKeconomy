@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 
 import be.noki_senpai.NKeconomy.EcoCmd;
 import be.noki_senpai.NKeconomy.NKeconomy;
-import be.noki_senpai.NKeconomy.data.Players;
 import be.noki_senpai.NKeconomy.utils.CheckType;
 
 public class Pay
@@ -39,7 +38,7 @@ public class Pay
 				{
 					if(CheckType.isNumber(args[2]))
 					{
-						if(Players.hasAccount(args[1]))
+						if(NKeconomy.hasAccount(args[1]))
 						{
 							if(NKeconomy.removeAmount(sender.getName(), Double.parseDouble(args[2])))
 							{

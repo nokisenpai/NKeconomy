@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 
 import be.noki_senpai.NKeconomy.EcoCmd;
 import be.noki_senpai.NKeconomy.NKeconomy;
-import be.noki_senpai.NKeconomy.data.Players;
 import be.noki_senpai.NKeconomy.utils.CheckType;
 
 public class Set
@@ -37,7 +36,7 @@ public class Set
 				{
 					if(CheckType.isNumber(args[2]))
 					{
-						if(Players.hasAccount(args[1]))
+						if(NKeconomy.hasAccount(args[1]))
 						{
 							NKeconomy.setAmount(args[1], Double.parseDouble(args[2]));
 							if(Bukkit.getPlayer(args[1])!=null)
@@ -74,7 +73,7 @@ public class Set
 			{
 				if(CheckType.isNumber(args[2]))
 				{
-					if(Players.hasAccount(args[1]))
+					if(NKeconomy.hasAccount(args[1]))
 					{
 						NKeconomy.setAmount(args[1], Double.parseDouble(args[2]));
 						if(Bukkit.getPlayer(args[1])!=null)
