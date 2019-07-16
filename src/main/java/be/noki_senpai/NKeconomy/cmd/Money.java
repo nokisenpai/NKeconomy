@@ -6,7 +6,6 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import be.noki_senpai.NKeconomy.NKeconomy;
-import be.noki_senpai.NKeconomy.data.Players;
 
 public class Money 
 {	
@@ -28,7 +27,7 @@ public class Money
 				else
 				{
 					// Display amount money of sender
-					sender.sendMessage(ChatColor.GREEN + "Vous avez " + NKeconomy.format(NKeconomy.players.get(sender.getName()).getPlayerAccount().getAmount()) + " " + NKeconomy.currency);
+					sender.sendMessage(ChatColor.GREEN + "Vous avez " + NKeconomy.format(NKeconomy.accounts.get(sender.getName()).getAmount()) + " " + NKeconomy.currency);
 				}
 				
 				return true;
@@ -45,9 +44,9 @@ public class Money
 				}
 				else
 				{
-					if(Players.hasAccount(args[1]))
+					if(NKeconomy.hasAccount(args[1]))
 					{
-						sender.sendMessage(ChatColor.AQUA + args[1] + ChatColor.GREEN + " a " + NKeconomy.format(Players.getBalance(args[1])) + " " + NKeconomy.currency);
+						sender.sendMessage(ChatColor.AQUA + args[1] + ChatColor.GREEN + " a " + NKeconomy.format(NKeconomy.getBalance(args[1])) + " " + NKeconomy.currency);
 					}
 					else
 					{
@@ -70,9 +69,9 @@ public class Money
 			}
 			if(args.length == 2)
 			{
-				if(Players.hasAccount(args[1]))
+				if(NKeconomy.hasAccount(args[1]))
 				{
-					sender.sendMessage(ChatColor.AQUA + args[1] + ChatColor.GREEN + " a " + NKeconomy.format(Players.getBalance(args[1])) + " " + NKeconomy.currency);
+					sender.sendMessage(ChatColor.AQUA + args[1] + ChatColor.GREEN + " a " + NKeconomy.format(NKeconomy.getBalance(args[1])) + " " + NKeconomy.currency);
 				}
 				else
 				{

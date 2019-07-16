@@ -8,7 +8,6 @@ import org.bukkit.entity.Player;
 
 import be.noki_senpai.NKeconomy.EcoCmd;
 import be.noki_senpai.NKeconomy.NKeconomy;
-import be.noki_senpai.NKeconomy.data.Players;
 import be.noki_senpai.NKeconomy.utils.CheckType;
 
 public class Give
@@ -37,7 +36,7 @@ public class Give
 				{
 					if(CheckType.isNumber(args[2]))
 					{
-						if(Players.hasAccount(args[1]))
+						if(NKeconomy.hasAccount(args[1]))
 						{
 							NKeconomy.addAmount(args[1], Double.parseDouble(args[2]));
 							if(Bukkit.getPlayer(args[1])!=null)
@@ -50,9 +49,9 @@ public class Give
 						{
 							if(args[1].equals("*"))
 							{
-								NKeconomy.players.forEach((key, value) -> 
+								NKeconomy.accounts.forEach((key, value) -> 
 								{
-									value.getPlayerAccount().addAmount(Double.parseDouble(args[2]));
+									value.addAmount(Double.parseDouble(args[2]));
 									Bukkit.getPlayer(value.getPlayerUUID()).sendMessage(ChatColor.GREEN + " Vous avez reçu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 									sender.sendMessage(ChatColor.AQUA + value.getPlayerName() + ChatColor.GREEN + " a reçu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 								});
@@ -86,7 +85,7 @@ public class Give
 			{
 				if(CheckType.isNumber(args[2]))
 				{
-					if(Players.hasAccount(args[1]))
+					if(NKeconomy.hasAccount(args[1]))
 					{
 						NKeconomy.addAmount(args[1], Double.parseDouble(args[2]));
 						if(Bukkit.getPlayer(args[1])!=null)
@@ -99,9 +98,9 @@ public class Give
 					{
 						if(args[1].equals("*"))
 						{
-							NKeconomy.players.forEach((key, value) -> 
+							NKeconomy.accounts.forEach((key, value) -> 
 							{
-								value.getPlayerAccount().addAmount(Double.parseDouble(args[2]));
+								value.addAmount(Double.parseDouble(args[2]));
 								Bukkit.getPlayer(value.getPlayerUUID()).sendMessage(ChatColor.GREEN + " Vous avez reçu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 								sender.sendMessage(ChatColor.AQUA + value.getPlayerName() + ChatColor.GREEN + " a reçu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 							});
