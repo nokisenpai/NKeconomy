@@ -472,11 +472,11 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 				accounts.get(playerName).removeAmount(amount);
 				if(crossServer && Bukkit.getPlayer(playerName)!=null)
 				{
-					Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + " Vous avez maintenant " + format(amount) + " " + currency);
+					Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + " Vous avez perdu " + format(amount) + " " + currency);
 				}
 				return true;
 	    	}
-			else if(playerListServer.contains(playerName))
+			else if(!crossServer && playerListServer.contains(playerName))
 			{
 				if(accounts.size() != 0)
 				{
@@ -531,6 +531,10 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 		if(accounts.containsKey(playerName))
     	{
 			accounts.get(playerName).setAmount(amount);
+			if(crossServer && Bukkit.getPlayer(playerName)!=null)
+			{
+				Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + " Vous avez maintenant " + format(amount) + " " + currency);
+			}
     	}
 		else if(playerListServer.contains(playerName))
 		{
