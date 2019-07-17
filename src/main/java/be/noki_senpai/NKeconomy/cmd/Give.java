@@ -38,7 +38,7 @@ public class Give
 					{
 						if(NKeconomy.hasAccount(args[1]))
 						{
-							NKeconomy.addAmount(args[1], Double.parseDouble(args[2]));
+							NKeconomy.giveAmount(args[1], Double.parseDouble(args[2]), false);
 							if(Bukkit.getPlayer(args[1])!=null)
 							{
 								Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GREEN + " Vous avez reçu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
@@ -87,7 +87,7 @@ public class Give
 				{
 					if(NKeconomy.hasAccount(args[1]))
 					{
-						NKeconomy.addAmount(args[1], Double.parseDouble(args[2]));
+						NKeconomy.giveAmount(args[1], Double.parseDouble(args[2]), false);
 						if(Bukkit.getPlayer(args[1])!=null)
 						{
 							Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GREEN + " Vous avez reçu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);

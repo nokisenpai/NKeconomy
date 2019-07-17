@@ -150,7 +150,7 @@ public class Economy_NKeconomy extends AbstractEconomy
         EconomyResponse.ResponseType type;
         String errorMessage = null;
 
-        if(NKeconomy.removeAmount(playerName, amount))
+        if(NKeconomy.takeAmount(playerName, amount, false))
         {
 	        balance = getBalance(playerName);
 	        type = EconomyResponse.ResponseType.SUCCESS;
@@ -179,7 +179,7 @@ public class Economy_NKeconomy extends AbstractEconomy
         String errorMessage = null;
         
         
-        NKeconomy.addAmount(playerName, amount);
+        NKeconomy.giveAmount(playerName, amount, false);
         balance = getBalance(playerName);
         type = EconomyResponse.ResponseType.SUCCESS;
 

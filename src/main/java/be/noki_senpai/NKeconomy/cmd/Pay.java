@@ -40,9 +40,9 @@ public class Pay
 					{
 						if(NKeconomy.hasAccount(args[1]))
 						{
-							if(NKeconomy.removeAmount(sender.getName(), Double.parseDouble(args[2])))
+							if(NKeconomy.takeAmount(sender.getName(), Double.parseDouble(args[2]), false))
 							{
-								NKeconomy.addAmount(args[1], Double.parseDouble(args[2]));
+								NKeconomy.payAmount(args[1], Double.parseDouble(args[2]), sender.getName());
 								if(Bukkit.getPlayer(args[1])!=null)
 								{
 									Bukkit.getPlayer(args[1]).sendMessage(ChatColor.AQUA + sender.getName() + ChatColor.GREEN + " vous avez donné " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);

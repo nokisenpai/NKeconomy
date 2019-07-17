@@ -8,8 +8,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
@@ -23,6 +25,11 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import com.google.common.collect.Iterables;
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 
 import be.noki_senpai.NKeconomy.data.Accounts;
 import be.noki_senpai.NKeconomy.listeners.EcoCompleter;
@@ -43,6 +50,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	
 	// Accounts datas
 	public static Map<String, Accounts> accounts = new TreeMap<String, Accounts>(String.CASE_INSENSITIVE_ORDER);
+	public static List<String> playerListServer = new ArrayList<String>();
 	
 	private static NKeconomy instance;
 	private static Connection bdd = null;
@@ -112,6 +120,11 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			this.getCommand("eco").setTabCompleter(new EcoCompleter());
 			getCommand("eco").setExecutor(new EcoCmd());
 			
+			//Data exchange between servers
+			this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+		    this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
+			
+		    //Get all connected players
 			Bukkit.getOnlinePlayers().forEach(player -> accounts.putIfAbsent(player.getDisplayName(), new Accounts(player.getUniqueId())));
 			
 			new BukkitRunnable() 
@@ -348,13 +361,81 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	}
 
 	// Add amount to a player
-	public static void addAmount(String playerName, Double amount)
+	public static void payAmount(String playerName, Double amount, String sender)
 	{
 		amount = round(amount);
 		if(accounts.containsKey(playerName))
     	{
 			accounts.get(playerName).addAmount(amount);
+			if(Bukkit.getPlayer(playerName)!=null)
+			{
+				Bukkit.getPlayer(playerName).sendMessage(ChatColor.AQUA + sender + ChatColor.GREEN + " vous avez donné " + format(amount) + " " + currency);
+			}
     	}
+		else if(playerListServer.contains(playerName))
+		{
+			ByteArrayDataOutput out = ByteStreams.newDataOutput();
+			out.writeUTF("NKeconomy");
+			out.writeUTF("add|" + playerName + "|" + amount + "|" + sender);
+			
+			Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+			
+			player.sendPluginMessage(NKeconomy.getInstance(), "BungeeCord", out.toByteArray());
+		}
+		else
+		{
+			Connection bdd = null;
+			PreparedStatement ps = null;
+			String req = null;
+
+	        try
+			{
+	        	bdd = getInstance().getConnection();
+	        	
+	        	req = "UPDATE " + table.get("accounts") + " SET amount = amount + ? WHERE name = ?";
+				ps = bdd.prepareStatement(req);
+				ps.setDouble(1, amount);
+				ps.setString(2, playerName);
+				
+				ps.executeUpdate();
+				ps.close();
+			} 
+	        catch (SQLException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	// Add amount to a player
+	public static void giveAmount(String playerName, Double amount, boolean crossServer)
+	{
+		amount = round(amount);
+		if(accounts.containsKey(playerName))
+    	{
+			accounts.get(playerName).addAmount(amount);
+			if(crossServer && Bukkit.getPlayer(playerName) != null)
+			{
+				Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + " Vous avez reçu " + format(amount) + " " + currency);
+			}
+    	}
+		else if(playerListServer.contains(playerName))
+		{
+			if(accounts.size() != 0)
+			{
+				ByteArrayDataOutput out = ByteStreams.newDataOutput();
+				out.writeUTF("NKeconomy");
+				out.writeUTF("add|" + playerName + "|" + amount + "|null");
+				
+				Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+				
+				player.sendPluginMessage(NKeconomy.getInstance(), "BungeeCord", out.toByteArray());
+			}
+			else
+			{
+				NKeconomy.getInstance().console.sendMessage(ChatColor.DARK_RED + PName + " " + playerName + " est connecté(e) sur un autre serveur. Utilisez la console de ce serveur pour lui donner des " + currency);
+			}
+		}
 		else
 		{
 			Connection bdd = null;
@@ -381,7 +462,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	}
 	
 	// Remove amount to a player
-	public static boolean removeAmount(String playerName, Double amount)
+	public static boolean takeAmount(String playerName, Double amount, boolean crossServer)
 	{
 		amount = round(amount);
 		if(NKeconomy.getBalance(playerName) >= amount)
@@ -389,8 +470,32 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			if(accounts.containsKey(playerName))
 	    	{
 				accounts.get(playerName).removeAmount(amount);
+				if(crossServer && Bukkit.getPlayer(playerName)!=null)
+				{
+					Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + " Vous avez maintenant " + format(amount) + " " + currency);
+				}
 				return true;
 	    	}
+			else if(playerListServer.contains(playerName))
+			{
+				if(accounts.size() != 0)
+				{
+					ByteArrayDataOutput out = ByteStreams.newDataOutput();
+					out.writeUTF("NKeconomy");
+					out.writeUTF("remove|" + playerName + "|" + amount);
+					
+					Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+					
+					player.sendPluginMessage(NKeconomy.getInstance(), "BungeeCord", out.toByteArray());
+					return true;
+				}
+				else
+				{
+					NKeconomy.getInstance().console.sendMessage(ChatColor.DARK_RED + PName + " " + playerName + " est connecté(e) sur un autre serveur. Utilisez la console de ce serveur pour lui retirer des " + currency);
+					return false;
+				}
+				
+			}
 			else
 			{
 				Connection bdd = null;
@@ -420,13 +525,30 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	}
 
 	// Set amount of a player
-	public static void setAmount(String playerName, Double amount)
+	public static void setAmount(String playerName, Double amount, boolean crossServer)
 	{
 		amount = round(amount);
 		if(accounts.containsKey(playerName))
     	{
 			accounts.get(playerName).setAmount(amount);
     	}
+		else if(playerListServer.contains(playerName))
+		{
+			if(accounts.size() != 0)
+			{
+				ByteArrayDataOutput out = ByteStreams.newDataOutput();
+				out.writeUTF("NKeconomy");
+				out.writeUTF("set|" + playerName + "|" + amount);
+				
+				Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+				
+				player.sendPluginMessage(NKeconomy.getInstance(), "BungeeCord", out.toByteArray());
+			}
+			else
+			{
+				NKeconomy.getInstance().console.sendMessage(ChatColor.DARK_RED + PName + " " + playerName + " est connecté(e) sur un autre serveur. Utilisez la console de ce serveur pour lui définir son nombre de " + currency);
+			}
+		}
 		else
 		{
 			Connection bdd = null;
@@ -536,9 +658,39 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	//######################################
 
 	@Override
-	public void onPluginMessageReceived(String arg0, Player arg1, byte[] arg2)
+	public void onPluginMessageReceived(String channel, Player player, byte[] message)
 	{
+		if (!channel.equals("BungeeCord")) 
+		{
+			return;
+		}
 		
+		ByteArrayDataInput in = ByteStreams.newDataInput(message);
+		String subchannel = in.readUTF();
+		
+		if (subchannel.equals("NKeconomy")) 
+		{
+			String[] args = in.readUTF().split("|");
+			if(args.length >= 4)
+			{
+				switch(args[0])
+				{
+					case "give": NKeconomy.giveAmount(args[1], Double.parseDouble(args[2]), true);
+						break;
+					case "pay": NKeconomy.payAmount(args[1], Double.parseDouble(args[2]), args[3]);
+						break;
+					case "remove": NKeconomy.takeAmount(args[1], Double.parseDouble(args[2]), true);
+						break;
+					case "set": NKeconomy.setAmount(args[1], Double.parseDouble(args[2]), true);
+						break;
+					case "playerJoin": playerListServer.add(args[1]);
+						break;
+					case "playerLeave": playerListServer.remove(args[1]);
+						break;
+					default:
+				}
+			}
+		}
 	}
 	
 	
