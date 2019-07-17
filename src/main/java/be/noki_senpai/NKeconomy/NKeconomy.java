@@ -482,7 +482,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 				{
 					ByteArrayDataOutput out = ByteStreams.newDataOutput();
 					out.writeUTF("NKeconomy");
-					out.writeUTF("remove|" + playerName + "|" + amount);
+					out.writeUTF("remove|" + playerName + "|" + amount + "|null");
 					
 					Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
 					
@@ -542,7 +542,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			{
 				ByteArrayDataOutput out = ByteStreams.newDataOutput();
 				out.writeUTF("NKeconomy");
-				out.writeUTF("set|" + playerName + "|" + amount);
+				out.writeUTF("set|" + playerName + "|" + amount + "|null");
 				
 				Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
 				
