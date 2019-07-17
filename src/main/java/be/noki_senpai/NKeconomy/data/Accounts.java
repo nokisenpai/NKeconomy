@@ -169,7 +169,7 @@ public class Accounts
 		{
         	bdd = NKeconomy.getInstance().getConnection();
         	
-        	req = "UPDATE " + NKeconomy.table.get("accounts") + " SET amount = ? WHERE player_id = ?";
+        	req = "UPDATE " + NKeconomy.table.get("accounts") + " SET amount = ? WHERE id = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setDouble(1, getAmount());
 			ps.setInt(2, getId());
