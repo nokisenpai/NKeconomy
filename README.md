@@ -1,2 +1,6 @@
 # NKeconomy
-A minecraft economy plugin
+A simple spigot/bukkit economy plugin.
+
+- Vault compatibility
+- Cross server support (via Bungee)
+- SQL storage (only)
