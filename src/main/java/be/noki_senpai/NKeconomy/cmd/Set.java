@@ -38,10 +38,10 @@ public class Set
 					{
 						if(NKeconomy.hasAccount(args[1]))
 						{
-							NKeconomy.setAmount(args[1], Double.parseDouble(args[2]));
+							NKeconomy.setAmount(args[1], Double.parseDouble(args[2]), false);
 							if(Bukkit.getPlayer(args[1])!=null)
 							{
-								Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GREEN + " Vous avez maintenant " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
+								Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GREEN + "Vous avez maintenant " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 							}
 							sender.sendMessage(ChatColor.AQUA + args[1] + ChatColor.GREEN + " a maintenant " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 						}
@@ -75,11 +75,7 @@ public class Set
 				{
 					if(NKeconomy.hasAccount(args[1]))
 					{
-						NKeconomy.setAmount(args[1], Double.parseDouble(args[2]));
-						if(Bukkit.getPlayer(args[1])!=null)
-						{
-							Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GREEN + " Vous avez maintenant " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
-						}
+						NKeconomy.setAmount(args[1], Double.parseDouble(args[2]), false);
 						sender.sendMessage(ChatColor.AQUA + args[1] + ChatColor.GREEN + " a maintenant " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 					}
 					else

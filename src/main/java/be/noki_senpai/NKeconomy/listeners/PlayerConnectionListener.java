@@ -16,7 +16,8 @@ public class PlayerConnectionListener implements Listener
     @EventHandler
     public void PlayerJoinEvent(final PlayerJoinEvent event) 
     {
-    	NKeconomy.accounts.putIfAbsent(event.getPlayer().getDisplayName(),new Accounts(event.getPlayer().getUniqueId()));
+    	NKeconomy.accounts.putIfAbsent(event.getPlayer().getName(),new Accounts(event.getPlayer().getUniqueId()));
+    	NKeconomy.addOtherServer(event.getPlayer().getName());
     }
 
     @EventHandler
@@ -24,14 +25,6 @@ public class PlayerConnectionListener implements Listener
     {	
     	NKeconomy.accounts.get(Bukkit.getOfflinePlayer(event.getPlayer().getUniqueId()).getName()).save();
     	NKeconomy.accounts.remove(Bukkit.getOfflinePlayer(event.getPlayer().getUniqueId()).getName());
+    	NKeconomy.removeOtherServer(event.getPlayer().getName());
     }
-
-    /*@EventHandler
-    public void onCooldownEnd(CooldownEndEvent event) 
-    {
-        if (!event.getKey().equals(JobsMain.getInstance().getName() + "-updateJobs")) return;
-
-        JobPlayer jobPlayer = JobsMain.getInstance().players.get(event.getPlayer().getUniqueId());
-        if (jobPlayer != null) jobPlayer.save();
-    }*/
 }

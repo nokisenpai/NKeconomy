@@ -38,7 +38,7 @@ public class Take
 					{
 						if(NKeconomy.hasAccount(args[1]))
 						{
-							if(NKeconomy.removeAmount(args[1], Double.parseDouble(args[2])))
+							if(NKeconomy.takeAmount(args[1], Double.parseDouble(args[2]), false))
 							{
 								if(Bukkit.getPlayer(args[1])!=null)
 								{
@@ -82,17 +82,21 @@ public class Take
 				{
 					if(NKeconomy.hasAccount(args[1]))
 					{
-						if(NKeconomy.removeAmount(args[1], Double.parseDouble(args[2])))
+						if(NKeconomy.takeAmount(args[1], Double.parseDouble(args[2]), false))
 						{
-							if(Bukkit.getPlayer(args[1])!=null)
-							{
-								Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GREEN + " Vous avez été prelevé de " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
-							}
 							sender.sendMessage(ChatColor.AQUA + args[1] + ChatColor.GREEN + " a perdu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 						}
 						else
 						{
-							sender.sendMessage(ChatColor.RED + "Le joueur n'a pas assez de " + NKeconomy.currency);
+							if(NKeconomy.getBalance(args[1]) >= Double.parseDouble(args[2]))
+					    	{
+								sender.sendMessage(ChatColor.RED + "Le joueur n'a pas assez de " + NKeconomy.currency);
+					    	}
+							else
+							{
+								sender.sendMessage(ChatColor.DARK_RED + " " + args[1] + " est connecté(e) sur un autre serveur. Utilisez la console de ce serveur pour lui retirer des " + NKeconomy.currency);
+							}
+							
 						}
 					}
 					else
