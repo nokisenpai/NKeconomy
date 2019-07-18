@@ -1,5 +1,8 @@
 package be.noki_senpai.NKeconomy;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Connection;
@@ -85,12 +88,13 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 		{
 			prefix = this.getConfig().getString("table-prefix");
 			startAmount = this.getConfig().getDouble("start-amount");
-			currency = this.getConfig().getString("currency").replace("&", "§");
+			currency = this.getConfig().getString("currency").replace("&", "Â§");
 			
 			// Save table name
 			table.put("accounts", prefix + "accounts");
+			table.put("cross_server", prefix + "cross_server");
 
-			//Setting database informations		
+			// Setting database informations		
 			SQLConnect.setInfo(this.getConfig().getString("host"), this.getConfig().getInt("port"), this.getConfig().getString("dbName"), this.getConfig().getString("user"), this.getConfig().getString("password"));
 			try
 			{
@@ -106,7 +110,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			
 			try 
 			{
-				//Creating database structure if not exist
+				// Creating database structure if not exist
 				Storage.createTable(this.getConfig().getString("dbName"), prefix, table);
 			} 
 			catch (SQLException e) 
@@ -115,16 +119,19 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 				getServer().getPluginManager().disablePlugin(this);
 			}
 			
-			//On command
+			// Purge cross_server for this server
+			purgeCrossServer();
+			
+			// On command
 			getServer().getPluginManager().registerEvents(new PlayerConnectionListener(), this);
 			this.getCommand("eco").setTabCompleter(new EcoCompleter());
 			getCommand("eco").setExecutor(new EcoCmd());
 			
-			//Data exchange between servers
+			// Data exchange between servers
 			this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
 		    this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
 			
-		    //Get all connected players
+		    // Get all connected players
 			Bukkit.getOnlinePlayers().forEach(player -> accounts.putIfAbsent(player.getDisplayName(), new Accounts(player.getUniqueId())));
 			
 			new BukkitRunnable() 
@@ -135,7 +142,9 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			        saveAll();
 			    }
 			}.runTaskTimerAsynchronously(this, 0, 300*20);
-			
+			console.sendMessage(ChatColor.WHITE + "      .--. ");
+			console.sendMessage(ChatColor.WHITE + "      |   '.   " + ChatColor.GREEN + PName + " by NoKi_senpai - successfully enabled !");
+			console.sendMessage(ChatColor.WHITE + "'-..____.-'");
 		}
 		else
 		{
@@ -361,7 +370,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	}
 
 	// Add amount to a player
-	public static void payAmount(String playerName, Double amount, String sender)
+	public static void payAmount(String playerName, Double amount, String sender, boolean crossServer)
 	{
 		amount = round(amount);
 		if(accounts.containsKey(playerName))
@@ -369,41 +378,59 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			accounts.get(playerName).addAmount(amount);
 			if(Bukkit.getPlayer(playerName)!=null)
 			{
-				Bukkit.getPlayer(playerName).sendMessage(ChatColor.AQUA + sender + ChatColor.GREEN + " vous avez donné " + format(amount) + " " + currency);
+				Bukkit.getPlayer(playerName).sendMessage(ChatColor.AQUA + sender + ChatColor.GREEN + " vous a donnÃ© " + format(amount) + " " + currency);
 			}
     	}
-		else if(playerListServer.contains(playerName))
+		else if(!crossServer)
 		{
-			ByteArrayDataOutput out = ByteStreams.newDataOutput();
-			out.writeUTF("NKeconomy");
-			out.writeUTF("add|" + playerName + "|" + amount + "|" + sender);
-			
-			Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-			
-			player.sendPluginMessage(NKeconomy.getInstance(), "BungeeCord", out.toByteArray());
-		}
-		else
-		{
-			Connection bdd = null;
-			PreparedStatement ps = null;
-			String req = null;
-
-	        try
+			String server = getOtherServer(playerName);
+			if(server != null)
 			{
-	        	bdd = getInstance().getConnection();
-	        	
-	        	req = "UPDATE " + table.get("accounts") + " SET amount = amount + ? WHERE name = ?";
-				ps = bdd.prepareStatement(req);
-				ps.setDouble(1, amount);
-				ps.setString(2, playerName);
+				ByteArrayDataOutput out = ByteStreams.newDataOutput();
+		    	out.writeUTF("Forward"); // So BungeeCord knows to forward it
+		    	out.writeUTF("ALL");
+				out.writeUTF("NKeconomy");
 				
-				ps.executeUpdate();
-				ps.close();
-			} 
-	        catch (SQLException e)
-			{
-				e.printStackTrace();
+				ByteArrayOutputStream msgbytes = new ByteArrayOutputStream();
+				DataOutputStream msgout = new DataOutputStream(msgbytes);
+				try 
+				{
+					msgout.writeUTF(server + "|pay|" + playerName + "|" + amount + "|" + sender);
+				} 
+				catch (IOException exception)
+				{
+					exception.printStackTrace();
+				}
+				
+				out.writeShort(msgbytes.toByteArray().length);
+				out.write(msgbytes.toByteArray());
+				
+				Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+				
+				player.sendPluginMessage(NKeconomy.getInstance(), "BungeeCord", out.toByteArray());
+				return;
 			}
+		}
+
+		Connection bdd = null;
+		PreparedStatement ps = null;
+		String req = null;
+
+        try
+		{
+        	bdd = getInstance().getConnection();
+        	
+        	req = "UPDATE " + table.get("accounts") + " SET amount = amount + ? WHERE name = ?";
+			ps = bdd.prepareStatement(req);
+			ps.setDouble(1, amount);
+			ps.setString(2, playerName);
+			
+			ps.executeUpdate();
+			ps.close();
+		} 
+        catch (SQLException e)
+		{
+			e.printStackTrace();
 		}
 	}
 	
@@ -416,48 +443,66 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			accounts.get(playerName).addAmount(amount);
 			if(crossServer && Bukkit.getPlayer(playerName) != null)
 			{
-				Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + " Vous avez reçu " + format(amount) + " " + currency);
+				Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + "Vous avez reÃ§u " + format(amount) + " " + currency);
 			}
     	}
-		else if(playerListServer.contains(playerName))
+		else if(!crossServer)
 		{
-			if(accounts.size() != 0)
+			String server = getOtherServer(playerName);
+			if(server != null)
 			{
-				ByteArrayDataOutput out = ByteStreams.newDataOutput();
-				out.writeUTF("NKeconomy");
-				out.writeUTF("add|" + playerName + "|" + amount + "|null");
-				
-				Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-				
-				player.sendPluginMessage(NKeconomy.getInstance(), "BungeeCord", out.toByteArray());
-			}
-			else
-			{
-				NKeconomy.getInstance().console.sendMessage(ChatColor.DARK_RED + PName + " " + playerName + " est connecté(e) sur un autre serveur. Utilisez la console de ce serveur pour lui donner des " + currency);
+				if(accounts.size() != 0)
+				{
+					ByteArrayDataOutput out = ByteStreams.newDataOutput();
+			    	out.writeUTF("Forward"); // So BungeeCord knows to forward it
+			    	out.writeUTF("ALL");
+					out.writeUTF("NKeconomy");
+					
+					ByteArrayOutputStream msgbytes = new ByteArrayOutputStream();
+					DataOutputStream msgout = new DataOutputStream(msgbytes);
+					try 
+					{
+						msgout.writeUTF(server + "|give|" + playerName + "|" + amount + "|null");
+					} 
+					catch (IOException exception)
+					{
+						exception.printStackTrace();
+					}
+					
+					out.writeShort(msgbytes.toByteArray().length);
+					out.write(msgbytes.toByteArray());
+									
+					Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+					
+					player.sendPluginMessage(NKeconomy.getInstance(), "BungeeCord", out.toByteArray());
+				}
+				else
+				{
+					NKeconomy.getInstance().console.sendMessage(ChatColor.DARK_RED + PName + " " + playerName + " est connectÃ©(e) sur un autre serveur. Utilisez la console de ce serveur pour lui donner des " + currency);
+				}
+				return;
 			}
 		}
-		else
-		{
-			Connection bdd = null;
-			PreparedStatement ps = null;
-			String req = null;
+		
+		Connection bdd = null;
+		PreparedStatement ps = null;
+		String req = null;
 
-	        try
-			{
-	        	bdd = getInstance().getConnection();
-	        	
-	        	req = "UPDATE " + table.get("accounts") + " SET amount = amount + ? WHERE name = ?";
-				ps = bdd.prepareStatement(req);
-				ps.setDouble(1, amount);
-				ps.setString(2, playerName);
-				
-				ps.executeUpdate();
-				ps.close();
-			} 
-	        catch (SQLException e)
-			{
-				e.printStackTrace();
-			}
+        try
+		{
+        	bdd = getInstance().getConnection();
+        	
+        	req = "UPDATE " + table.get("accounts") + " SET amount = amount + ? WHERE name = ?";
+			ps = bdd.prepareStatement(req);
+			ps.setDouble(1, amount);
+			ps.setString(2, playerName);
+			
+			ps.executeUpdate();
+			ps.close();
+		} 
+        catch (SQLException e)
+		{
+			e.printStackTrace();
 		}
 	}
 	
@@ -472,53 +517,70 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 				accounts.get(playerName).removeAmount(amount);
 				if(crossServer && Bukkit.getPlayer(playerName)!=null)
 				{
-					Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + " Vous avez perdu " + format(amount) + " " + currency);
+					Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + "Vous avez perdu " + format(amount) + " " + currency);
 				}
 				return true;
 	    	}
-			else if(!crossServer && playerListServer.contains(playerName))
+			else if(!crossServer)
 			{
-				if(accounts.size() != 0)
+				String server = getOtherServer(playerName);
+				if(server != null)
 				{
-					ByteArrayDataOutput out = ByteStreams.newDataOutput();
-					out.writeUTF("NKeconomy");
-					out.writeUTF("remove|" + playerName + "|" + amount + "|null");
-					
-					Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-					
-					player.sendPluginMessage(NKeconomy.getInstance(), "BungeeCord", out.toByteArray());
-					return true;
-				}
-				else
-				{
-					NKeconomy.getInstance().console.sendMessage(ChatColor.DARK_RED + PName + " " + playerName + " est connecté(e) sur un autre serveur. Utilisez la console de ce serveur pour lui retirer des " + currency);
-					return false;
-				}
-				
-			}
-			else
-			{
-				Connection bdd = null;
-				PreparedStatement ps = null;
-				String req = null;
+					if(accounts.size() != 0)
+					{
+						ByteArrayDataOutput out = ByteStreams.newDataOutput();
+				    	out.writeUTF("Forward"); // So BungeeCord knows to forward it
+				    	out.writeUTF("ALL");
+						out.writeUTF("NKeconomy");
+						
+						ByteArrayOutputStream msgbytes = new ByteArrayOutputStream();
+						DataOutputStream msgout = new DataOutputStream(msgbytes);
+						try 
+						{
+							msgout.writeUTF(server + "|take|" + playerName + "|" + amount + "|null"); // You can do anything you want with msgout
+						} 
+						catch (IOException exception)
+						{
+							exception.printStackTrace();
+						}
+						
+						out.writeShort(msgbytes.toByteArray().length);
+						out.write(msgbytes.toByteArray());
+						
+						Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+						
+						player.sendPluginMessage(NKeconomy.getInstance(), "BungeeCord", out.toByteArray());
 	
-		        try
-				{
-	        		bdd = getInstance().getConnection();
-		        	
-		        	req = "UPDATE " + table.get("accounts") + " SET amount = amount - ? WHERE name = ?";
-					ps = bdd.prepareStatement(req);
-					ps.setDouble(1, amount);
-					ps.setString(2, playerName);
-					
-					ps.executeUpdate();
-					ps.close();
-					return true;
-				} 
-		        catch (SQLException e)
-				{
-					e.printStackTrace();
+						return true;
+					}
+					else
+					{
+						NKeconomy.getInstance().console.sendMessage(ChatColor.DARK_RED + PName + " " + playerName + " est connectÃ©(e) sur un autre serveur. Utilisez la console de ce serveur pour lui retirer des " + currency);
+						return false;
+					}
 				}
+			}
+
+			Connection bdd = null;
+			PreparedStatement ps = null;
+			String req = null;
+
+	        try
+			{
+        		bdd = getInstance().getConnection();
+	        	
+	        	req = "UPDATE " + table.get("accounts") + " SET amount = amount - ? WHERE name = ?";
+				ps = bdd.prepareStatement(req);
+				ps.setDouble(1, amount);
+				ps.setString(2, playerName);
+				
+				ps.executeUpdate();
+				ps.close();
+				return true;
+			} 
+	        catch (SQLException e)
+			{
+				e.printStackTrace();
 			}
     	}
 		return false;
@@ -533,48 +595,66 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			accounts.get(playerName).setAmount(amount);
 			if(crossServer && Bukkit.getPlayer(playerName)!=null)
 			{
-				Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + " Vous avez maintenant " + format(amount) + " " + currency);
+				Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + "Vous avez maintenant " + format(amount) + " " + currency);
 			}
     	}
-		else if(playerListServer.contains(playerName))
+		else if(!crossServer)
 		{
-			if(accounts.size() != 0)
+			String server = getOtherServer(playerName);
+			if(server != null)
 			{
-				ByteArrayDataOutput out = ByteStreams.newDataOutput();
-				out.writeUTF("NKeconomy");
-				out.writeUTF("set|" + playerName + "|" + amount + "|null");
-				
-				Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
-				
-				player.sendPluginMessage(NKeconomy.getInstance(), "BungeeCord", out.toByteArray());
-			}
-			else
-			{
-				NKeconomy.getInstance().console.sendMessage(ChatColor.DARK_RED + PName + " " + playerName + " est connecté(e) sur un autre serveur. Utilisez la console de ce serveur pour lui définir son nombre de " + currency);
+				if(accounts.size() != 0)
+				{
+					ByteArrayDataOutput out = ByteStreams.newDataOutput();
+			    	out.writeUTF("Forward"); // So BungeeCord knows to forward it
+			    	out.writeUTF("ALL");
+					out.writeUTF("NKeconomy");
+					
+					ByteArrayOutputStream msgbytes = new ByteArrayOutputStream();
+					DataOutputStream msgout = new DataOutputStream(msgbytes);
+					try 
+					{
+						msgout.writeUTF(server + "|set|" + playerName + "|" + amount + "|null"); // You can do anything you want with msgout
+					} 
+					catch (IOException exception)
+					{
+						exception.printStackTrace();
+					}
+					
+					out.writeShort(msgbytes.toByteArray().length);
+					out.write(msgbytes.toByteArray());
+					
+					Player player = Iterables.getFirst(Bukkit.getOnlinePlayers(), null);
+					
+					player.sendPluginMessage(NKeconomy.getInstance(), "BungeeCord", out.toByteArray());
+				}
+				else
+				{
+					NKeconomy.getInstance().console.sendMessage(ChatColor.DARK_RED + PName + " " + playerName + " est connectÃ©(e) sur un autre serveur. Utilisez la console de ce serveur pour lui dÃ©finir son nombre de " + currency);
+				}
+				return;
 			}
 		}
-		else
-		{
-			Connection bdd = null;
-			PreparedStatement ps = null;
-			String req = null;
 
-	        try
-			{
-	        	bdd = getInstance().getConnection();
-	        	
-	        	req = "UPDATE " + table.get("accounts") + " SET amount = ? WHERE name = ?";
-				ps = bdd.prepareStatement(req);
-				ps.setDouble(1, amount);
-				ps.setString(2, playerName);
-				
-				ps.executeUpdate();
-				ps.close();
-			} 
-	        catch (SQLException e)
-			{
-				e.printStackTrace();
-			}
+		Connection bdd = null;
+		PreparedStatement ps = null;
+		String req = null;
+
+        try
+		{
+        	bdd = getInstance().getConnection();
+        	
+        	req = "UPDATE " + table.get("accounts") + " SET amount = ? WHERE name = ?";
+			ps = bdd.prepareStatement(req);
+			ps.setDouble(1, amount);
+			ps.setString(2, playerName);
+			
+			ps.executeUpdate();
+			ps.close();
+		} 
+        catch (SQLException e)
+		{
+			e.printStackTrace();
 		}
 	}
 	
@@ -664,40 +744,155 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	@Override
 	public void onPluginMessageReceived(String channel, Player player, byte[] message)
 	{
+		
 		if (!channel.equals("BungeeCord")) 
 		{
 			return;
 		}
-		
 		ByteArrayDataInput in = ByteStreams.newDataInput(message);
 		String subchannel = in.readUTF();
 		
 		if (subchannel.equals("NKeconomy")) 
 		{
-			String[] args = in.readUTF().split("|");
-			if(args.length >= 4)
+			String tmp = in.readUTF();
+			tmp = tmp.substring(2, tmp.length());
+			String[] args = tmp.split("\\|");
+			
+			if(args.length >= 5)
 			{
-				switch(args[0])
+				if(args[0].equals(NKeconomy.getInstance().getServer().getMotd()))
 				{
-					case "give": NKeconomy.giveAmount(args[1], Double.parseDouble(args[2]), true);
-						break;
-					case "pay": NKeconomy.payAmount(args[1], Double.parseDouble(args[2]), args[3]);
-						break;
-					case "remove": NKeconomy.takeAmount(args[1], Double.parseDouble(args[2]), true);
-						break;
-					case "set": NKeconomy.setAmount(args[1], Double.parseDouble(args[2]), true);
-						break;
-					case "playerJoin": playerListServer.add(args[1]);
-						break;
-					case "playerLeave": playerListServer.remove(args[1]);
-						break;
-					default:
+					switch(args[1])
+					{
+						case "give": NKeconomy.giveAmount(args[2], Double.parseDouble(args[3]), true);
+							//NKeconomy.getInstance().console.sendMessage(args[2] + " a recu " + args[3] + " " + currency);
+							break;
+						case "pay": NKeconomy.payAmount(args[2], Double.parseDouble(args[3]), args[4], true);
+							//NKeconomy.getInstance().console.sendMessage(args[4] + " a donne " + args[3] + " " + currency + " a " + args[2]);
+							break;
+						case "take": NKeconomy.takeAmount(args[2], Double.parseDouble(args[3]), true);
+							//NKeconomy.getInstance().console.sendMessage(args[2] + " a perdu " + args[3] + " " + currency);
+							break;
+						case "set": NKeconomy.setAmount(args[2], Double.parseDouble(args[3]), true);
+							//NKeconomy.getInstance().console.sendMessage(args[2] + " a maintenant " + args[3] + " " + currency);
+							break;
+						default:
+					}
 				}
 			}
 		}
 	}
 	
+	// Purge cross server
+	public static void purgeCrossServer()
+	{
+		Connection bdd = null;
+		PreparedStatement ps = null;
+		String req = null;
+
+        try
+		{
+        	bdd = getInstance().getConnection();
+        	
+        	req = "DELETE FROM " + table.get("cross_server") + " WHERE server = ?";
+			ps = bdd.prepareStatement(req);
+			ps.setString(1, NKeconomy.getInstance().getServer().getMotd());
+			
+			ps.execute();
+			ps.close();
+		} 
+        catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+	}
 	
+	// Check if a player is connected in other server
+	public static String getOtherServer(String playername)
+	{
+		Connection bdd = null;
+		PreparedStatement ps = null;
+		ResultSet resultat = null;
+		String req = null;
+
+        try
+		{
+        	bdd = getInstance().getConnection();
+        	
+        	req = "SELECT server FROM " + NKeconomy.table.get("cross_server") + " WHERE name = ?";
+			ps = bdd.prepareStatement(req);
+			ps.setString(1, playername);
+			
+	        resultat = ps.executeQuery();
+	        
+	        if(resultat.next()) 
+	        {
+	        	String server = resultat.getString("server");
+	        	
+	        	resultat.close();
+	        	ps.close();
+	        	
+	        	return server;
+	        }
+	        resultat.close();
+        	ps.close();
+		} 
+        catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+        
+		return null;
+	}
+	
+	// Add a player entry on sql DB with his server
+	public static void addOtherServer(String playername)
+	{
+		Connection bdd = null;
+		PreparedStatement ps = null;
+		String req = null;
+		
+		try
+		{
+			bdd = getInstance().getConnection();
+			
+			req = "INSERT INTO " + NKeconomy.table.get("cross_server") + " ( name, server ) VALUES ( ? , ? )";		        
+	        ps = bdd.prepareStatement(req);
+	        ps.setString(1, playername);
+	        ps.setString(2, NKeconomy.getInstance().getServer().getMotd());
+	        
+	        ps.execute();   
+	        ps.close();
+		} 
+        catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	// Remove a player entry on sql DB with his server
+	public static void removeOtherServer(String playername)
+	{
+		Connection bdd = null;
+		PreparedStatement ps = null;
+		String req = null;
+
+        try
+		{
+        	bdd = getInstance().getConnection();
+        	
+        	req = "DELETE FROM " + table.get("cross_server") + " WHERE name = ?";
+			ps = bdd.prepareStatement(req);
+			ps.setString(1, playername);
+			
+			ps.execute();
+			ps.close();
+		} 
+        catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+	}
 	
 	//######################################
 	// External feature
@@ -707,7 +902,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	{
 		Bukkit.getOnlinePlayers().forEach((player) -> 
 		{
-			player.kickPlayer("Le serveur redémarre.");
+			player.kickPlayer("Le serveur redÃ©marre.");
 		});
 	}
 }

@@ -38,7 +38,7 @@ public class Economy_NKeconomy extends AbstractEconomy
             if (nkeconomy != null && nkeconomy.isEnabled()) 
             {
                 economy = (NKeconomy) nkeconomy;
-                log.info(String.format("[%s][Economy] %s hooked.", plugin.getDescription().getName(), name));
+                log.info(String.format("[%s] hooked as economy plugin.", plugin.getDescription().getName(), name));
             }
         }
     }
@@ -62,7 +62,7 @@ public class Economy_NKeconomy extends AbstractEconomy
                 if (nkeconomy.getDescription().getName().equals(economy.name)) 
                 {
                     economy.economy = (NKeconomy) nkeconomy;
-                    log.info(String.format("[%s][Economy] %s hooked.", plugin.getDescription().getName(), economy.name));
+                    log.info(String.format("[%s] hooked as economy plugin.", plugin.getDescription().getName(), economy.name));
                 }
             }
         }
@@ -75,7 +75,7 @@ public class Economy_NKeconomy extends AbstractEconomy
                 if (event.getPlugin().getDescription().getName().equals(economy.name)) 
                 {
                     economy.economy = null;
-                    log.info(String.format("[%s][Economy] %s unhooked.", plugin.getDescription().getName(), economy.name));
+                    log.info(String.format("[%s] unhooked as economy plugin.", plugin.getDescription().getName(), economy.name));
                 }
             }
         }

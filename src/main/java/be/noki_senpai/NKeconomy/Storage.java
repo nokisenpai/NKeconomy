@@ -53,6 +53,18 @@ public class Storage
 					s = bdd.createStatement();
 			        s.execute(req);
 			        s.close();
+			        
+			        
+			        // Creating cross_server table
+			        req = "CREATE TABLE IF NOT EXISTS `" + table.get("cross_server") + "` (" +
+						 "`id` int(11) NOT NULL AUTO_INCREMENT," +
+						 "`name` varchar(40) NOT NULL," +
+						 "`server` varchar(120) NOT NULL," +
+						 "PRIMARY KEY (`id`)" +
+						") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+					s = bdd.createStatement();
+			        s.execute(req);
+			        s.close();
 					
 					console.sendMessage(ChatColor.GREEN + PName + " Database structure created.");
 				}

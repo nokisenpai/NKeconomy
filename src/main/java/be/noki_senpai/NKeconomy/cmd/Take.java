@@ -84,10 +84,6 @@ public class Take
 					{
 						if(NKeconomy.takeAmount(args[1], Double.parseDouble(args[2]), false))
 						{
-							if(Bukkit.getPlayer(args[1])!=null)
-							{
-								Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GREEN + " Vous avez été prelevé de " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
-							}
 							sender.sendMessage(ChatColor.AQUA + args[1] + ChatColor.GREEN + " a perdu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 						}
 						else

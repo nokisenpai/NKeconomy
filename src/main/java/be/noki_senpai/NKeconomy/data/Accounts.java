@@ -44,6 +44,7 @@ public class Accounts
 	        if(resultat.next()) 
 	        {
 	        	setId(resultat.getInt("id"));
+	        	setAmount(resultat.getDouble("amount"));
 	        	// If names are differents, update in database
 	        	if(!resultat.getString("name").equals(getPlayerName()))
 	        	{
@@ -169,10 +170,10 @@ public class Accounts
 		{
         	bdd = NKeconomy.getInstance().getConnection();
         	
-        	req = "UPDATE " + NKeconomy.table.get("accounts") + " SET amount = ? WHERE id = ?";
+        	req = "UPDATE " + NKeconomy.table.get("accounts") + " SET amount = ? WHERE uuid = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setDouble(1, getAmount());
-			ps.setInt(2, getId());
+			ps.setString(2, getPlayerUUID().toString());
 			
 			ps.executeUpdate();
 			ps.close();

@@ -21,7 +21,7 @@ public class Money
 				if(!(sender.hasPermission("*") || sender.hasPermission("nkeco.*") || sender.hasPermission("nkeco.money") || sender.hasPermission("nkeco.user") || sender.hasPermission("nkeco.admin")))
 				{
 					// Send that the player does not have the permission
-					sender.sendMessage(ChatColor.RED + NKeconomy.PName + " Vous n'avez pas la permission !");
+					sender.sendMessage(ChatColor.RED + " Vous n'avez pas la permission !");
 					return true;
 				}
 				else
