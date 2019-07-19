@@ -881,9 +881,10 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 		{
         	bdd = getInstance().getConnection();
         	
-        	req = "DELETE FROM " + table.get("cross_server") + " WHERE name = ?";
+        	req = "DELETE FROM " + table.get("cross_server") + " WHERE name = ? AND server = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setString(1, playername);
+			ps.setString(2, NKeconomy.getInstance().getServer().getMotd());
 			
 			ps.execute();
 			ps.close();
