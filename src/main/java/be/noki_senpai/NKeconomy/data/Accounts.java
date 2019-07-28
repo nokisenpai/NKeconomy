@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import be.noki_senpai.NKeconomy.NKeconomy;
 
@@ -162,25 +163,32 @@ public class Accounts
 	
 	public void save()
 	{
-		Connection bdd = null;
-		PreparedStatement ps = null;
-		String req = null;
+		new BukkitRunnable() 
+		{
+		    @Override
+		    public void run() 
+		    {
+		    	Connection bdd = null;
+				PreparedStatement ps = null;
+				String req = null;
 
-        try
-		{
-        	bdd = NKeconomy.getInstance().getConnection();
-        	
-        	req = "UPDATE " + NKeconomy.table.get("accounts") + " SET amount = ? WHERE uuid = ?";
-			ps = bdd.prepareStatement(req);
-			ps.setDouble(1, getAmount());
-			ps.setString(2, getPlayerUUID().toString());
-			
-			ps.executeUpdate();
-			ps.close();
-		} 
-        catch (SQLException e)
-		{
-			e.printStackTrace();
-		}
+		        try
+				{
+		        	bdd = NKeconomy.getInstance().getConnection();
+		        	
+		        	req = "UPDATE " + NKeconomy.table.get("accounts") + " SET amount = ? WHERE uuid = ?";
+					ps = bdd.prepareStatement(req);
+					ps.setDouble(1, getAmount());
+					ps.setString(2, getPlayerUUID().toString());
+					
+					ps.executeUpdate();
+					ps.close();
+				} 
+		        catch (SQLException e)
+				{
+					e.printStackTrace();
+				}
+		    }
+		}.runTaskAsynchronously(NKeconomy.getInstance());
 	}
 }
