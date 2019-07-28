@@ -6,24 +6,14 @@ import com.zaxxer.hikari.HikariDataSource;
 public class SQLConnect 
 {
     private static HikariConfig jdbcConfig = new HikariConfig();
-    private static HikariDataSource ds = null;    
-	
-	/*
-	private SQLConnect()
-	{
-		
-	}
-	private static class DataSourceHolder 
-	{
-		private static final SQLConnect INSTANCE = new SQLConnect();
-	}
-	public static SQLConnect getInstance() 
-	{
-		return DataSourceHolder.INSTANCE;
-	}*/
+    private static HikariDataSource ds = null;
 
 	public static HikariDataSource getHikariDS() 
 	{
+		if(ds.isClosed())
+		{
+			ds = new HikariDataSource(jdbcConfig);
+		}
 		return ds;
 	}
 	
