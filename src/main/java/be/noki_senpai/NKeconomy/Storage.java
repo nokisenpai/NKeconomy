@@ -119,6 +119,16 @@ public class Storage
         		console.sendMessage(ChatColor.GREEN + PName + " Missing table(s). First start.");
         		return false;
         	}
+	        resultat.close();
+	        ps.close();
+	        
+	        req = "SHOW TABLES FROM " + dbName + " LIKE 'NK_cross_server'";
+	        ps = bdd.prepareStatement(req);
+	        resultat = ps.executeQuery();
+	        if(resultat.next())
+	        {
+	        	count++;
+	        }
 	        
 	        //if 1 or more tables are missing
 	        else if(count < table.size())

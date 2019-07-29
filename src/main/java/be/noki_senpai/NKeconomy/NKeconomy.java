@@ -92,7 +92,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			
 			// Save table name
 			table.put("accounts", prefix + "accounts");
-			table.put("cross_server", "NKcross_server");
+			table.put("cross_server", "NK_cross_server");
 
 			// Setting database informations		
 			SQLConnect.setInfo(this.getConfig().getString("host"), this.getConfig().getInt("port"), this.getConfig().getString("dbName"), this.getConfig().getString("user"), this.getConfig().getString("password"));
