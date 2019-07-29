@@ -22,6 +22,7 @@ public class SQLConnect
 		jdbcConfig.setPoolName("NKeconomy");
 	    jdbcConfig.setMaximumPoolSize(10);
 	    jdbcConfig.setMinimumIdle(2);
+	    jdbcConfig.setMaxLifetime(900000);
 	    jdbcConfig.setJdbcUrl("jdbc:mysql://" + host_ + ":" + port_ + "/" + dbName_ + "?useSSL=false");
 	    jdbcConfig.setUsername(user_);
 	    jdbcConfig.setPassword(password_);
