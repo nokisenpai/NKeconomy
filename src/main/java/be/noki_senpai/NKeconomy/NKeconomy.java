@@ -34,6 +34,7 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
+import be.noki_senpai.NKeconomy.cmd.EcoCmd;
 import be.noki_senpai.NKeconomy.data.Accounts;
 import be.noki_senpai.NKeconomy.listeners.EcoCompleter;
 import be.noki_senpai.NKeconomy.listeners.PlayerConnectionListener;
@@ -48,6 +49,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	public static Map<String, String> table = new HashMap<>();
 	
 	// Options
+	public static String serverName = "world";
 	public static double startAmount = 100;
 	public static String currency = "Lumi";
 	
@@ -86,6 +88,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 		
 		if(this.getConfig().getBoolean("use-mysql"))
 		{
+			serverName = this.getConfig().getString("server-name");
 			prefix = this.getConfig().getString("table-prefix");
 			startAmount = this.getConfig().getDouble("start-amount");
 			currency = this.getConfig().getString("currency").replace("&", "§");
@@ -802,7 +805,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			
 			if(args.length >= 5)
 			{
-				if(args[0].equals(NKeconomy.getInstance().getServer().getMotd()))
+				if(args[0].equals(NKeconomy.serverName))
 				{
 					switch(args[1])
 					{
@@ -838,7 +841,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
         	
         	req = "DELETE FROM " + table.get("cross_server") + " WHERE server = ?";
 			ps = bdd.prepareStatement(req);
-			ps.setString(1, NKeconomy.getInstance().getServer().getMotd());
+			ps.setString(1, NKeconomy.serverName);
 			
 			ps.execute();
 			ps.close();
@@ -901,7 +904,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			req = "INSERT INTO " + NKeconomy.table.get("cross_server") + " ( name, server ) VALUES ( ? , ? )";		        
 	        ps = bdd.prepareStatement(req);
 	        ps.setString(1, playername);
-	        ps.setString(2, NKeconomy.getInstance().getServer().getMotd());
+	        ps.setString(2, NKeconomy.serverName);
 	        
 	        ps.execute();   
 	        ps.close();
@@ -926,7 +929,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
         	req = "DELETE FROM " + table.get("cross_server") + " WHERE name = ? AND server = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setString(1, playername);
-			ps.setString(2, NKeconomy.getInstance().getServer().getMotd());
+			ps.setString(2, NKeconomy.serverName);
 			
 			ps.execute();
 			ps.close();
