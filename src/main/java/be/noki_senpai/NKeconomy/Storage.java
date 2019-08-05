@@ -131,7 +131,7 @@ public class Storage
 	        }
 	        
 	        //if 1 or more tables are missing
-	        else if(count < table.size())
+	        if(count < table.size())
         	{
         		console.sendMessage(ChatColor.DARK_RED + PName + " Missing table(s). Please don't alter tables name or structure in database. (Error#main.Storage.002)");
         		return false;

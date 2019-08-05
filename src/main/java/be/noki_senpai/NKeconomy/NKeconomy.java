@@ -45,7 +45,7 @@ import net.milkbowl.vault.economy.Economy;
 public class NKeconomy extends JavaPlugin implements PluginMessageListener
 {
 	public final static String PName = "[NKeconomy]";
-	public static String prefix;
+	public static String prefix = "NKhome";
 	public static Map<String, String> table = new HashMap<>();
 	
 	// Options
