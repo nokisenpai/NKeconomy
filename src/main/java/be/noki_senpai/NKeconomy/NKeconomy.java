@@ -197,8 +197,12 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	{
 		try
 		{
-			if(bdd.isClosed())
+			if(!bdd.isValid(1))
 			{
+				if(!bdd.isClosed())
+				{
+					bdd.close();
+				}
 				bdd = SQLConnect.getHikariDS().getConnection();
 			}
 		} 
