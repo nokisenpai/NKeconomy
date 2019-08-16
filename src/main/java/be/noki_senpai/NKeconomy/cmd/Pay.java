@@ -5,7 +5,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import be.noki_senpai.NKeconomy.EcoCmd;
 import be.noki_senpai.NKeconomy.NKeconomy;
 import be.noki_senpai.NKeconomy.utils.CheckType;
 

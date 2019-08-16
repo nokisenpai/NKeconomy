@@ -1,15 +1,10 @@
-package be.noki_senpai.NKeconomy;
+package be.noki_senpai.NKeconomy.cmd;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-import be.noki_senpai.NKeconomy.cmd.Give;
-import be.noki_senpai.NKeconomy.cmd.Money;
-import be.noki_senpai.NKeconomy.cmd.Pay;
-import be.noki_senpai.NKeconomy.cmd.Set;
-import be.noki_senpai.NKeconomy.cmd.Take;
-import be.noki_senpai.NKeconomy.cmd.Top;
+import be.noki_senpai.NKeconomy.NKeconomy;
 
 public class EcoCmd implements CommandExecutor
 {

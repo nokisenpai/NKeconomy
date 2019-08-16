@@ -10,5 +10,6 @@ user: root
 password: 
 
 # Options
+server-name: 'world'
 start-amount: 100
 currency: Lumi
