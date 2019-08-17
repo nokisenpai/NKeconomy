@@ -3,20 +3,20 @@ package be.noki_senpai.NKeconomy.utils;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-public class SQLConnect 
+public class SQLConnect
 {
 	private static HikariConfig jdbcConfig = new HikariConfig();
 	private static HikariDataSource ds = null;
 
-	public static HikariDataSource getHikariDS() 
+	public static HikariDataSource getHikariDS()
 	{
-		if(ds.isClosed())
+		if (ds.isClosed())
 		{
 			ds = new HikariDataSource(jdbcConfig);
 		}
 		return ds;
 	}
-	
+
 	public static void setInfo(String host_, int port_, String dbName_, String user_, String password_)
 	{
 		jdbcConfig.setPoolName("NKeconomy");
