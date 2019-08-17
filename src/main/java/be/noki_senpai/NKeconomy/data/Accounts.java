@@ -39,50 +39,50 @@ public class Accounts
 			ps = bdd.prepareStatement(req);
 			ps.setString(1, getPlayerUUID().toString());
 			
-	        resultat = ps.executeQuery();
-	        
-	        // If there is a result account exist
-	        if(resultat.next()) 
-	        {
-	        	setId(resultat.getInt("id"));
-	        	setAmount(resultat.getDouble("amount"));
-	        	// If names are differents, update in database
-	        	if(!resultat.getString("name").equals(getPlayerName()))
-	        	{
-	        		ps.close();
-		        	resultat.close();
-		        	
-	        		req = "UPDATE " + NKeconomy.table.get("accounts") + " SET name = ? WHERE id = ?";  
-			        ps = bdd.prepareStatement(req);
-			        ps.setString(1, getPlayerName());
-			        ps.setInt(2, getId());
-			        
-			        ps.executeUpdate();
-	        	}
-	        }
-	        else
-	        {
-	        	//Add new player on database
-	        	ps.close();
-	        	resultat.close();
-	        	
-	        	req = "INSERT INTO " + NKeconomy.table.get("accounts") + " ( uuid, name, amount ) VALUES ( ? , ? , ? )";		        
-		        ps = bdd.prepareStatement(req, Statement.RETURN_GENERATED_KEYS);
-		        ps.setString(1, getPlayerUUID().toString());
-		        ps.setString(2, getPlayerName());
-		        ps.setDouble(3, NKeconomy.startAmount);
-		        
-		        ps.executeUpdate();  
-		        resultat = ps.getGeneratedKeys();    
-		        
-		        resultat.next();  
-		        setId(resultat.getInt(1));
-		        
-		        setAmount(NKeconomy.startAmount);
-		        
-		        ps.close();
-		        resultat.close();
-	        }
+			resultat = ps.executeQuery();
+			
+			// If there is a result account exist
+			if(resultat.next()) 
+			{
+				setId(resultat.getInt("id"));
+				setAmount(resultat.getDouble("amount"));
+				// If names are differents, update in database
+				if(!resultat.getString("name").equals(getPlayerName()))
+				{
+					ps.close();
+					resultat.close();
+					
+					req = "UPDATE " + NKeconomy.table.get("accounts") + " SET name = ? WHERE id = ?";  
+					ps = bdd.prepareStatement(req);
+					ps.setString(1, getPlayerName());
+					ps.setInt(2, getId());
+					
+					ps.executeUpdate();
+				}
+			}
+			else
+			{
+				//Add new player on database
+				ps.close();
+				resultat.close();
+				
+				req = "INSERT INTO " + NKeconomy.table.get("accounts") + " ( uuid, name, amount ) VALUES ( ? , ? , ? )";				
+				ps = bdd.prepareStatement(req, Statement.RETURN_GENERATED_KEYS);
+				ps.setString(1, getPlayerUUID().toString());
+				ps.setString(2, getPlayerName());
+				ps.setDouble(3, NKeconomy.startAmount);
+				
+				ps.executeUpdate();  
+				resultat = ps.getGeneratedKeys();	
+				
+				resultat.next();  
+				setId(resultat.getInt(1));
+				
+				setAmount(NKeconomy.startAmount);
+				
+				ps.close();
+				resultat.close();
+			}
 		} 
 		catch (SQLException e) 
 		{
@@ -165,18 +165,18 @@ public class Accounts
 	{
 		new BukkitRunnable() 
 		{
-		    @Override
-		    public void run() 
-		    {
-		    	Connection bdd = null;
+			@Override
+			public void run() 
+			{
+				Connection bdd = null;
 				PreparedStatement ps = null;
 				String req = null;
 
-		        try
+				try
 				{
-		        	bdd = NKeconomy.getInstance().getConnection();
-		        	
-		        	req = "UPDATE " + NKeconomy.table.get("accounts") + " SET amount = ? WHERE uuid = ?";
+					bdd = NKeconomy.getInstance().getConnection();
+					
+					req = "UPDATE " + NKeconomy.table.get("accounts") + " SET amount = ? WHERE uuid = ?";
 					ps = bdd.prepareStatement(req);
 					ps.setDouble(1, getAmount());
 					ps.setString(2, getPlayerUUID().toString());
@@ -184,11 +184,11 @@ public class Accounts
 					ps.executeUpdate();
 					ps.close();
 				} 
-		        catch (SQLException e)
+				catch (SQLException e)
 				{
 					e.printStackTrace();
 				}
-		    }
+			}
 		}.runTaskAsynchronously(NKeconomy.getInstance());
 	}
 }

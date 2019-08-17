@@ -41,8 +41,8 @@ public class Storage
 								
 				try
 				{
-			        // Creating accounts table
-			        req = "CREATE TABLE IF NOT EXISTS `" + table.get("accounts") + "` (" +
+					// Creating accounts table
+					req = "CREATE TABLE IF NOT EXISTS `" + table.get("accounts") + "` (" +
 						 "`id` int(11) NOT NULL AUTO_INCREMENT," +
 						 "`uuid` varchar(40) NOT NULL," +
 						 "`name` varchar(40) NOT NULL," +
@@ -51,20 +51,20 @@ public class Storage
 						 "UNIQUE KEY `uuid_unique` (`uuid`) USING BTREE" +
 						") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 					s = bdd.createStatement();
-			        s.execute(req);
-			        s.close();
-			        
-			        
-			        // Creating cross_server table
-			        req = "CREATE TABLE IF NOT EXISTS `" + table.get("cross_server") + "` (" +
+					s.execute(req);
+					s.close();
+					
+					
+					// Creating cross_server table
+					req = "CREATE TABLE IF NOT EXISTS `" + table.get("cross_server") + "` (" +
 						 "`id` int(11) NOT NULL AUTO_INCREMENT," +
 						 "`name` varchar(40) NOT NULL," +
 						 "`server` varchar(120) NOT NULL," +
 						 "PRIMARY KEY (`id`)" +
 						") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 					s = bdd.createStatement();
-			        s.execute(req);
-			        s.close();
+					s.execute(req);
+					s.close();
 					
 					console.sendMessage(ChatColor.GREEN + PName + " Database structure created.");
 				}
@@ -76,10 +76,10 @@ public class Storage
 				}
 				finally
 				{
-				    if(s != null)
-				    {
-				    	s.close();
-				    }
+					if(s != null)
+					{
+						s.close();
+					}
 				}
 			}
 		}
@@ -106,36 +106,36 @@ public class Storage
 		try 
 		{
 			ps = bdd.prepareStatement(req);
-	        resultat = ps.executeQuery();
-	        int count = 0;
-	        while(resultat.next()) 
-	        {
-	        	count++;
-	        }
-	        
-	        //if all tables are missing
-	        if(count == 0)
-        	{
-        		console.sendMessage(ChatColor.GREEN + PName + " Missing table(s). First start.");
-        		return false;
-        	}
-	        resultat.close();
-	        ps.close();
-	        
-	        req = "SHOW TABLES FROM " + dbName + " LIKE 'NK_cross_server'";
-	        ps = bdd.prepareStatement(req);
-	        resultat = ps.executeQuery();
-	        if(resultat.next())
-	        {
-	        	count++;
-	        }
-	        
-	        //if 1 or more tables are missing
-	        if(count < table.size())
-        	{
-        		console.sendMessage(ChatColor.DARK_RED + PName + " Missing table(s). Please don't alter tables name or structure in database. (Error#main.Storage.002)");
-        		return false;
-        	}
+			resultat = ps.executeQuery();
+			int count = 0;
+			while(resultat.next()) 
+			{
+				count++;
+			}
+			
+			//if all tables are missing
+			if(count == 0)
+			{
+				console.sendMessage(ChatColor.GREEN + PName + " Missing table(s). First start.");
+				return false;
+			}
+			resultat.close();
+			ps.close();
+			
+			req = "SHOW TABLES FROM " + dbName + " LIKE 'NK_cross_server'";
+			ps = bdd.prepareStatement(req);
+			resultat = ps.executeQuery();
+			if(resultat.next())
+			{
+				count++;
+			}
+			
+			//if 1 or more tables are missing
+			if(count < table.size())
+			{
+				console.sendMessage(ChatColor.DARK_RED + PName + " Missing table(s). Please don't alter tables name or structure in database. (Error#main.Storage.002)");
+				return false;
+			}
 		} 
 		catch (SQLException e1) 
 		{
@@ -144,14 +144,14 @@ public class Storage
 		}
 		finally
 		{
-		    if(ps != null)
-		    {
-		    	ps.close();
-		    }
-		    if(resultat != null)
-		    {
-		    	resultat.close();
-		    }
+			if(ps != null)
+			{
+				ps.close();
+			}
+			if(resultat != null)
+			{
+				resultat.close();
+			}
 		}
 		
 		return true;

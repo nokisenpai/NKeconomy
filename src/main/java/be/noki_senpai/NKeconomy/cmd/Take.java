@@ -88,9 +88,9 @@ public class Take
 						else
 						{
 							if(NKeconomy.getBalance(args[1]) >= Double.parseDouble(args[2]))
-					    	{
+							{
 								sender.sendMessage(ChatColor.RED + "Le joueur n'a pas assez de " + NKeconomy.currency);
-					    	}
+							}
 							else
 							{
 								sender.sendMessage(ChatColor.DARK_RED + " " + args[1] + " est connecté(e) sur un autre serveur. Utilisez la console de ce serveur pour lui retirer des " + NKeconomy.currency);
