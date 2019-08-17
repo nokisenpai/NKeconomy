@@ -70,7 +70,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	
 	// Fired when plugin is first enabled
 	@Override
-    public void onEnable() 
+	public void onEnable() 
 	{
 		instance = this;
 		
@@ -79,10 +79,10 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 		
 		if (!setupEconomy()) 
 		{
-            console.sendMessage(ChatColor.DARK_RED + PName + " Disabled due to no Vault dependency found ! (Error#A.2.000)");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+			console.sendMessage(ChatColor.DARK_RED + PName + " Disabled due to no Vault dependency found ! (Error#A.2.000)");
+			getServer().getPluginManager().disablePlugin(this);
+			return;
+		}
 				
 		this.saveDefaultConfig();
 		
@@ -132,21 +132,21 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			
 			// Data exchange between servers
 			this.getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-		    this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
+			this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
 			
-		    // Get all connected players
+			// Get all connected players
 			Bukkit.getOnlinePlayers().forEach(player -> accounts.putIfAbsent(player.getDisplayName(), new Accounts(player.getUniqueId())));
 			
 			new BukkitRunnable() 
 			{
-			    @Override
-			    public void run() 
-			    {
-			        saveAll();
-			    }
+				@Override
+				public void run() 
+				{
+					saveAll();
+				}
 			}.runTaskTimerAsynchronously(this, 0, 300*20);
-			console.sendMessage(ChatColor.WHITE + "      .--. ");
-			console.sendMessage(ChatColor.WHITE + "      |   '.   " + ChatColor.GREEN + PName + " by NoKi_senpai - successfully enabled !");
+			console.sendMessage(ChatColor.WHITE + "	  .--. ");
+			console.sendMessage(ChatColor.WHITE + "	  |   '.   " + ChatColor.GREEN + PName + " by NoKi_senpai - successfully enabled !");
 			console.sendMessage(ChatColor.WHITE + "'-..____.-'");
 		}
 		else
@@ -155,38 +155,38 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			getServer().getPluginManager().disablePlugin(this);
 		}
 		
-    }
+	}
 	
 	
-    // Fired when plugin is disabled
-    @Override
-    public void onDisable() 
-    {
-    	if(bdd != null)
-    	{
-    		saveAll();
-        	accounts.clear();
-        	try
-    		{
-    			bdd.close();
-    		} 
-        	catch (SQLException e)
-    		{
-    			// TODO Auto-generated catch block
-    			e.printStackTrace();
-    		}
-    	}
-    	kickAllPlayers();
-    	console.sendMessage(ChatColor.GREEN + PName + " has been disable.");
-    }
-    
+	// Fired when plugin is disabled
+	@Override
+	public void onDisable() 
+	{
+		if(bdd != null)
+		{
+			saveAll();
+			accounts.clear();
+			try
+			{
+				bdd.close();
+			} 
+			catch (SQLException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		kickAllPlayers();
+		console.sendMessage(ChatColor.GREEN + PName + " has been disable.");
+	}
+	
 
-    
+	
 	//######################################
 	// Getters & Setters
 	//######################################
-    
-    // Getter 'instance'
+	
+	// Getter 'instance'
 	public static NKeconomy getInstance()
 	{
 		return instance;
@@ -237,18 +237,18 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	
 	private boolean setupEconomy() 
 	{
-        if (getServer().getPluginManager().getPlugin("Vault") == null) 
-        {
-            return false;
-        }
-        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-        if (rsp == null) 
-        {
-            return false;
-        }
-        economy = rsp.getProvider();
-        return economy != null;
-    }
+		if (getServer().getPluginManager().getPlugin("Vault") == null) 
+		{
+			return false;
+		}
+		RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+		if (rsp == null) 
+		{
+			return false;
+		}
+		economy = rsp.getProvider();
+		return economy != null;
+	}
 	
 	
 	
@@ -285,15 +285,15 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			
 			tmp2 += "-1)";
 	
-	        try
+			try
 			{
-	        	bdd = NKeconomy.getInstance().getConnection();
-	        	req = "UPDATE " + table.get("accounts") + " SET amount = CASE id " + tmp1 + "ELSE amount END WHERE id IN" + tmp2; 
+				bdd = NKeconomy.getInstance().getConnection();
+				req = "UPDATE " + table.get("accounts") + " SET amount = CASE id " + tmp1 + "ELSE amount END WHERE id IN" + tmp2; 
 				ps = bdd.prepareStatement(req);
 				ps.executeUpdate();
 				ps.close();
 			} 
-	        catch (SQLException e)
+			catch (SQLException e)
 			{
 				e.printStackTrace();
 			}
@@ -310,9 +310,9 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	public static double getBalance(String playerName)
 	{
 		if(accounts.containsKey(playerName))
-    	{
-    		return accounts.get(playerName).getAmount();
-    	}
+		{
+			return accounts.get(playerName).getAmount();
+		}
 		else
 		{
 			Connection bdd = null;
@@ -320,26 +320,26 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			ResultSet resultat = null;
 			String req = null;
 			
-	        try
+			try
 			{
-	        	bdd = NKeconomy.getInstance().getConnection();
-	        	
-	        	req = "SELECT amount FROM " + table.get("accounts") + " WHERE name = ?";	
+				bdd = NKeconomy.getInstance().getConnection();
+				
+				req = "SELECT amount FROM " + table.get("accounts") + " WHERE name = ?";	
 				ps = bdd.prepareStatement(req);
 				ps.setString(1, playerName);
 				
-		        resultat = ps.executeQuery();
-		        if(resultat.next())
-		        {
-		        	double amount = resultat.getDouble("amount");
-		        	ps.close();
-		        	resultat.close();
-		        	return amount;
-		        }
-		        ps.close();
-	        	resultat.close();
+				resultat = ps.executeQuery();
+				if(resultat.next())
+				{
+					double amount = resultat.getDouble("amount");
+					ps.close();
+					resultat.close();
+					return amount;
+				}
+				ps.close();
+				resultat.close();
 			} 
-	        catch (SQLException e)
+			catch (SQLException e)
 			{
 				e.printStackTrace();
 			}   
@@ -351,9 +351,9 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	public static boolean hasAccount(String playerName)
 	{
 		if(NKeconomy.accounts.containsKey(playerName))
-    	{
-    		return true;
-    	}
+		{
+			return true;
+		}
 		else
 		{
 			Connection bdd = null;
@@ -361,27 +361,27 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			ResultSet resultat = null;
 			String req = null;
 			
-	        try
+			try
 			{
-	        	bdd = NKeconomy.getInstance().getConnection();
-	        	
-	        	req = "SELECT COUNT(id) FROM " + NKeconomy.table.get("accounts") + " WHERE name = ?";
+				bdd = NKeconomy.getInstance().getConnection();
+				
+				req = "SELECT COUNT(id) FROM " + NKeconomy.table.get("accounts") + " WHERE name = ?";
 				ps = bdd.prepareStatement(req);
 				ps.setString(1, playerName);
 				
-		        resultat = ps.executeQuery();
-		        resultat.next();
-		        
-		        if(resultat.getInt(1)==1)
-		        {
-		        	ps.close();
-		        	resultat.close();
-		        	return true;
-		        }
-		        ps.close();
-		        resultat.close();
+				resultat = ps.executeQuery();
+				resultat.next();
+				
+				if(resultat.getInt(1)==1)
+				{
+					ps.close();
+					resultat.close();
+					return true;
+				}
+				ps.close();
+				resultat.close();
 			} 
-	        catch (SQLException e)
+			catch (SQLException e)
 			{
 				e.printStackTrace();
 			}   
@@ -394,21 +394,21 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	{
 		final Double amount = round(amount_);
 		if(accounts.containsKey(playerName))
-    	{
+		{
 			accounts.get(playerName).addAmount(amount);
 			if(Bukkit.getPlayer(playerName)!=null)
 			{
 				Bukkit.getPlayer(playerName).sendMessage(ChatColor.AQUA + sender + ChatColor.GREEN + " vous a donné " + format(amount) + " " + currency);
 			}
-    	}
+		}
 		else if(!crossServer)
 		{
 			String server = getOtherServer(playerName);
 			if(server != null)
 			{
 				ByteArrayDataOutput out = ByteStreams.newDataOutput();
-		    	out.writeUTF("Forward"); // So BungeeCord knows to forward it
-		    	out.writeUTF("ALL");
+				out.writeUTF("Forward"); // So BungeeCord knows to forward it
+				out.writeUTF("ALL");
 				out.writeUTF("NKeconomy");
 				
 				ByteArrayOutputStream msgbytes = new ByteArrayOutputStream();
@@ -433,18 +433,18 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 		}
 		new BukkitRunnable() 
 		{
-		    @Override
-		    public void run() 
-		    {
-		    	Connection bdd = null;
+			@Override
+			public void run() 
+			{
+				Connection bdd = null;
 				PreparedStatement ps = null;
 				String req = null;
 
-		        try
+				try
 				{
-		        	bdd = NKeconomy.getInstance().getConnection();
-		        	
-		        	req = "UPDATE " + table.get("accounts") + " SET amount = amount + ? WHERE name = ?";
+					bdd = NKeconomy.getInstance().getConnection();
+					
+					req = "UPDATE " + table.get("accounts") + " SET amount = amount + ? WHERE name = ?";
 					ps = bdd.prepareStatement(req);
 					ps.setDouble(1, amount);
 					ps.setString(2, playerName);
@@ -452,11 +452,11 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 					ps.executeUpdate();
 					ps.close();
 				} 
-		        catch (SQLException e)
+				catch (SQLException e)
 				{
 					e.printStackTrace();
 				}
-		    }
+			}
 		}.runTaskAsynchronously(NKeconomy.getInstance());
 		
 	}
@@ -466,13 +466,13 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	{
 		final Double amount = round(amount_);
 		if(accounts.containsKey(playerName))
-    	{
+		{
 			accounts.get(playerName).addAmount(amount);
 			if(crossServer && Bukkit.getPlayer(playerName) != null)
 			{
 				Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + "Vous avez reçu " + format(amount) + " " + currency);
 			}
-    	}
+		}
 		else if(!crossServer)
 		{
 			String server = getOtherServer(playerName);
@@ -481,8 +481,8 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 				if(accounts.size() != 0)
 				{
 					ByteArrayDataOutput out = ByteStreams.newDataOutput();
-			    	out.writeUTF("Forward"); // So BungeeCord knows to forward it
-			    	out.writeUTF("ALL");
+					out.writeUTF("Forward"); // So BungeeCord knows to forward it
+					out.writeUTF("ALL");
 					out.writeUTF("NKeconomy");
 					
 					ByteArrayOutputStream msgbytes = new ByteArrayOutputStream();
@@ -513,18 +513,18 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 		
 		new BukkitRunnable() 
 		{
-		    @Override
-		    public void run() 
-		    {
-		    	Connection bdd = null;
+			@Override
+			public void run() 
+			{
+				Connection bdd = null;
 				PreparedStatement ps = null;
 				String req = null;
 
-		        try
+				try
 				{
-		        	bdd = NKeconomy.getInstance().getConnection();
-		        	
-		        	req = "UPDATE " + table.get("accounts") + " SET amount = amount + ? WHERE name = ?";
+					bdd = NKeconomy.getInstance().getConnection();
+					
+					req = "UPDATE " + table.get("accounts") + " SET amount = amount + ? WHERE name = ?";
 					ps = bdd.prepareStatement(req);
 					ps.setDouble(1, amount);
 					ps.setString(2, playerName);
@@ -532,11 +532,11 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 					ps.executeUpdate();
 					ps.close();
 				} 
-		        catch (SQLException e)
+				catch (SQLException e)
 				{
 					e.printStackTrace();
 				}
-		    }
+			}
 		}.runTaskAsynchronously(NKeconomy.getInstance());
 	}
 	
@@ -545,16 +545,16 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	{
 		final Double amount = round(amount_);
 		if(NKeconomy.getBalance(playerName) >= amount)
-    	{
+		{
 			if(accounts.containsKey(playerName))
-	    	{
+			{
 				accounts.get(playerName).removeAmount(amount);
 				if(crossServer && Bukkit.getPlayer(playerName)!=null)
 				{
 					Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + "Vous avez perdu " + format(amount) + " " + currency);
 				}
 				return true;
-	    	}
+			}
 			else if(!crossServer)
 			{
 				String server = getOtherServer(playerName);
@@ -563,8 +563,8 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 					if(accounts.size() != 0)
 					{
 						ByteArrayDataOutput out = ByteStreams.newDataOutput();
-				    	out.writeUTF("Forward"); // So BungeeCord knows to forward it
-				    	out.writeUTF("ALL");
+						out.writeUTF("Forward"); // So BungeeCord knows to forward it
+						out.writeUTF("ALL");
 						out.writeUTF("NKeconomy");
 						
 						ByteArrayOutputStream msgbytes = new ByteArrayOutputStream();
@@ -597,18 +597,18 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 
 			new BukkitRunnable() 
 			{
-			    @Override
-			    public void run() 
-			    {
-			    	Connection bdd = null;
+				@Override
+				public void run() 
+				{
+					Connection bdd = null;
 					PreparedStatement ps = null;
 					String req = null;
 
-			        try
+					try
 					{
-		        		bdd = NKeconomy.getInstance().getConnection();
-			        	
-			        	req = "UPDATE " + table.get("accounts") + " SET amount = amount - ? WHERE name = ?";
+						bdd = NKeconomy.getInstance().getConnection();
+						
+						req = "UPDATE " + table.get("accounts") + " SET amount = amount - ? WHERE name = ?";
 						ps = bdd.prepareStatement(req);
 						ps.setDouble(1, amount);
 						ps.setString(2, playerName);
@@ -617,14 +617,14 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 						ps.close();
 						
 					} 
-			        catch (SQLException e)
+					catch (SQLException e)
 					{
 						e.printStackTrace();
 					}
-			    }
+				}
 			}.runTaskAsynchronously(NKeconomy.getInstance());
 			return true;
-    	}
+		}
 		return false;
 	}
 
@@ -633,13 +633,13 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	{
 		final Double amount = round(amount_);
 		if(accounts.containsKey(playerName))
-    	{
+		{
 			accounts.get(playerName).setAmount(amount);
 			if(crossServer && Bukkit.getPlayer(playerName)!=null)
 			{
 				Bukkit.getPlayer(playerName).sendMessage(ChatColor.GREEN + "Vous avez maintenant " + format(amount) + " " + currency);
 			}
-    	}
+		}
 		else if(!crossServer)
 		{
 			String server = getOtherServer(playerName);
@@ -648,8 +648,8 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 				if(accounts.size() != 0)
 				{
 					ByteArrayDataOutput out = ByteStreams.newDataOutput();
-			    	out.writeUTF("Forward"); // So BungeeCord knows to forward it
-			    	out.writeUTF("ALL");
+					out.writeUTF("Forward"); // So BungeeCord knows to forward it
+					out.writeUTF("ALL");
 					out.writeUTF("NKeconomy");
 					
 					ByteArrayOutputStream msgbytes = new ByteArrayOutputStream();
@@ -680,18 +680,18 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 
 		new BukkitRunnable() 
 		{
-		    @Override
-		    public void run() 
-		    {
-		    	Connection bdd = null;
+			@Override
+			public void run() 
+			{
+				Connection bdd = null;
 				PreparedStatement ps = null;
 				String req = null;
 
-		        try
+				try
 				{
-		        	bdd = NKeconomy.getInstance().getConnection();
-		        	
-		        	req = "UPDATE " + table.get("accounts") + " SET amount = ? WHERE name = ?";
+					bdd = NKeconomy.getInstance().getConnection();
+					
+					req = "UPDATE " + table.get("accounts") + " SET amount = ? WHERE name = ?";
 					ps = bdd.prepareStatement(req);
 					ps.setDouble(1, amount);
 					ps.setString(2, playerName);
@@ -699,11 +699,11 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 					ps.executeUpdate();
 					ps.close();
 				} 
-		        catch (SQLException e)
+				catch (SQLException e)
 				{
 					e.printStackTrace();
 				}
-		    }
+			}
 		}.runTaskAsynchronously(NKeconomy.getInstance());
 	}
 	
@@ -720,11 +720,11 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			String req = null;
 	
 			
-	        try
+			try
 			{
-	        	bdd = NKeconomy.getInstance().getConnection();
-	        	
-	        	req = "SELECT name, amount FROM " + table.get("accounts") + " ORDER BY amount DESC LIMIT ?, 10";
+				bdd = NKeconomy.getInstance().getConnection();
+				
+				req = "SELECT name, amount FROM " + table.get("accounts") + " ORDER BY amount DESC LIMIT ?, 10";
 				ps = bdd.prepareStatement(req);
 				ps.setInt(1, (page-1)*10);
 				resultat = ps.executeQuery();
@@ -738,7 +738,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 				resultat.close();
 				return topAmount;
 			} 
-	        catch (SQLException e)
+			catch (SQLException e)
 			{
 				e.printStackTrace();
 			}
@@ -754,34 +754,34 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	
 	// Format amount
 	public static String format(double amount) 
-    {
+	{
 		String pattern = "";
 		if(amount % 1 == 0)
-    	{
+		{
 			pattern = "###,###,###,##0";
-    	}
+		}
 		else
 		{
 			pattern = "###,###,###,##0.00";
 		}
-    	
-    	DecimalFormatSymbols formatSymbols = new DecimalFormatSymbols(Locale.FRENCH);
-        formatSymbols.setDecimalSeparator(',');
-        formatSymbols.setGroupingSeparator(' ');
-    	
-        DecimalFormat decimalFormat = new DecimalFormat(pattern, formatSymbols);
-    	
-    	String format = decimalFormat.format(amount);
+		
+		DecimalFormatSymbols formatSymbols = new DecimalFormatSymbols(Locale.FRENCH);
+		formatSymbols.setDecimalSeparator(',');
+		formatSymbols.setGroupingSeparator(' ');
+		
+		DecimalFormat decimalFormat = new DecimalFormat(pattern, formatSymbols);
+		
+		String format = decimalFormat.format(amount);
   
-        return format;
+		return format;
 	}
 	
 	// Round amount
 	public static double round(double value) 
 	{
-	    BigDecimal bd = new BigDecimal(value);
-	    bd = bd.setScale(5, RoundingMode.HALF_UP);
-	    return bd.doubleValue();
+		BigDecimal bd = new BigDecimal(value);
+		bd = bd.setScale(5, RoundingMode.HALF_UP);
+		return bd.doubleValue();
 	}
 	
 	
@@ -839,18 +839,18 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 		PreparedStatement ps = null;
 		String req = null;
 
-        try
+		try
 		{
-        	bdd = NKeconomy.getInstance().getConnection();
-        	
-        	req = "DELETE FROM " + table.get("cross_server") + " WHERE server = ?";
+			bdd = NKeconomy.getInstance().getConnection();
+			
+			req = "DELETE FROM " + table.get("cross_server") + " WHERE server = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setString(1, NKeconomy.serverName);
 			
 			ps.execute();
 			ps.close();
 		} 
-        catch (SQLException e)
+		catch (SQLException e)
 		{
 			e.printStackTrace();
 		}
@@ -864,33 +864,33 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 		ResultSet resultat = null;
 		String req = null;
 
-        try
+		try
 		{
-        	bdd = NKeconomy.getInstance().getConnection();
-        	
-        	req = "SELECT server FROM " + NKeconomy.table.get("cross_server") + " WHERE name = ?";
+			bdd = NKeconomy.getInstance().getConnection();
+			
+			req = "SELECT server FROM " + NKeconomy.table.get("cross_server") + " WHERE name = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setString(1, playername);
 			
-	        resultat = ps.executeQuery();
-	        
-	        if(resultat.next()) 
-	        {
-	        	String server = resultat.getString("server");
-	        	
-	        	resultat.close();
-	        	ps.close();
-	        	
-	        	return server;
-	        }
-	        resultat.close();
-        	ps.close();
+			resultat = ps.executeQuery();
+			
+			if(resultat.next()) 
+			{
+				String server = resultat.getString("server");
+				
+				resultat.close();
+				ps.close();
+				
+				return server;
+			}
+			resultat.close();
+			ps.close();
 		} 
-        catch (SQLException e)
+		catch (SQLException e)
 		{
 			e.printStackTrace();
 		}
-        
+		
 		return null;
 	}
 	
@@ -905,15 +905,15 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 		{
 			bdd = NKeconomy.getInstance().getConnection();
 			
-			req = "INSERT INTO " + NKeconomy.table.get("cross_server") + " ( name, server ) VALUES ( ? , ? )";		        
-	        ps = bdd.prepareStatement(req);
-	        ps.setString(1, playername);
-	        ps.setString(2, NKeconomy.serverName);
-	        
-	        ps.execute();   
-	        ps.close();
+			req = "INSERT INTO " + NKeconomy.table.get("cross_server") + " ( name, server ) VALUES ( ? , ? )";				
+			ps = bdd.prepareStatement(req);
+			ps.setString(1, playername);
+			ps.setString(2, NKeconomy.serverName);
+			
+			ps.execute();   
+			ps.close();
 		} 
-        catch (SQLException e)
+		catch (SQLException e)
 		{
 			e.printStackTrace();
 		}
@@ -926,11 +926,11 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 		PreparedStatement ps = null;
 		String req = null;
 
-        try
+		try
 		{
-        	bdd = NKeconomy.getInstance().getConnection();
-        	
-        	req = "DELETE FROM " + table.get("cross_server") + " WHERE name = ? AND server = ?";
+			bdd = NKeconomy.getInstance().getConnection();
+			
+			req = "DELETE FROM " + table.get("cross_server") + " WHERE name = ? AND server = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setString(1, playername);
 			ps.setString(2, NKeconomy.serverName);
@@ -938,7 +938,7 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 			ps.execute();
 			ps.close();
 		} 
-        catch (SQLException e)
+		catch (SQLException e)
 		{
 			e.printStackTrace();
 		}

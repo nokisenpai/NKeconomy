@@ -8,5 +8,5 @@ website: www.lumen.ovh
 depend: [Vault]
 commands:
   eco:
-    description: Manages the server economy.
-    usage: /<command> <money|pay|top|give|take|set>
+	description: Manages the server economy.
+	usage: /<command> <money|pay|top|give|take|set>
