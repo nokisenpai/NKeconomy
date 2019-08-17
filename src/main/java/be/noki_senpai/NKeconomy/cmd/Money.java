@@ -7,18 +7,18 @@ import org.bukkit.entity.Player;
 
 import be.noki_senpai.NKeconomy.NKeconomy;
 
-public class Money 
-{	
+public class Money
+{
 	public static boolean money(CommandSender sender, String[] args)
 	{
 
 		// Command called by a player
-		if (sender instanceof Player) 
+		if (sender instanceof Player)
 		{
 			// If no more argument
-			if(args.length == 1)
+			if (args.length == 1)
 			{
-				if(!(sender.hasPermission("*") || sender.hasPermission("nkeco.*") || sender.hasPermission("nkeco.money") || sender.hasPermission("nkeco.user") || sender.hasPermission("nkeco.admin")))
+				if (!(sender.hasPermission("*") || sender.hasPermission("nkeco.*") || sender.hasPermission("nkeco.money") || sender.hasPermission("nkeco.user") || sender.hasPermission("nkeco.admin")))
 				{
 					// Send that the player does not have the permission
 					sender.sendMessage(ChatColor.RED + " Vous n'avez pas la permission !");
@@ -29,14 +29,14 @@ public class Money
 					// Display amount money of sender
 					sender.sendMessage(ChatColor.GREEN + "Vous avez " + NKeconomy.format(NKeconomy.accounts.get(sender.getName()).getAmount()) + " " + NKeconomy.currency);
 				}
-				
+
 				return true;
 			}
-			if(args.length == 2)
+			if (args.length == 2)
 			{
 				// Display money amount of player
 				// Check permission to display money amount of a player
-				if(!(sender.hasPermission("*") || sender.hasPermission("nkeco.*") || sender.hasPermission("nkeco.money.other") || sender.hasPermission("nkeco.money.*") || sender.hasPermission("nkeco.admin")))
+				if (!(sender.hasPermission("*") || sender.hasPermission("nkeco.*") || sender.hasPermission("nkeco.money.other") || sender.hasPermission("nkeco.money.*") || sender.hasPermission("nkeco.admin")))
 				{
 					// Send that the player does not have the permission
 					sender.sendMessage(ChatColor.RED + NKeconomy.PName + " Vous n'avez pas la permission !");
@@ -44,7 +44,7 @@ public class Money
 				}
 				else
 				{
-					if(NKeconomy.hasAccount(args[1]))
+					if (NKeconomy.hasAccount(args[1]))
 					{
 						sender.sendMessage(ChatColor.AQUA + args[1] + ChatColor.GREEN + " a " + NKeconomy.format(NKeconomy.getBalance(args[1])) + " " + NKeconomy.currency);
 					}
@@ -57,19 +57,18 @@ public class Money
 			}
 			return true;
 		}
-		
-		
+
 		// Command called by Console
 		if (sender instanceof ConsoleCommandSender)
 		{
-			if(args.length == 1)
+			if (args.length == 1)
 			{
 				sender.sendMessage(ChatColor.RED + "Dans la console, veuillez specifier un joueur.");
 				return true;
 			}
-			if(args.length == 2)
+			if (args.length == 2)
 			{
-				if(NKeconomy.hasAccount(args[1]))
+				if (NKeconomy.hasAccount(args[1]))
 				{
 					sender.sendMessage(ChatColor.AQUA + args[1] + ChatColor.GREEN + " a " + NKeconomy.format(NKeconomy.getBalance(args[1])) + " " + NKeconomy.currency);
 				}

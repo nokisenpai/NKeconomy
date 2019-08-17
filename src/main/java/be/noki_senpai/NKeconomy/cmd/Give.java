@@ -14,18 +14,18 @@ public class Give
 	public static boolean give(CommandSender sender, String[] args)
 	{
 		// Command called by a player
-		if (sender instanceof Player) 
+		if (sender instanceof Player)
 		{
 			// If no more argument
-			if(args.length == 1 || args.length == 2)
+			if (args.length == 1 || args.length == 2)
 			{
 				sender.sendMessage(ChatColor.GREEN + EcoCmd.usageCmdGive);
 				return true;
 			}
-			if(args.length == 3)
+			if (args.length == 3)
 			{
 				// Check permission to display money amount of a player
-				if(!(sender.hasPermission("*") || sender.hasPermission("nkeco.*") || sender.hasPermission("nkeco.give") || sender.hasPermission("nkeco.admin")))
+				if (!(sender.hasPermission("*") || sender.hasPermission("nkeco.*") || sender.hasPermission("nkeco.give") || sender.hasPermission("nkeco.admin")))
 				{
 					// Send that the player does not have the permission
 					sender.sendMessage(ChatColor.RED + NKeconomy.PName + " Vous n'avez pas la permission !");
@@ -33,12 +33,12 @@ public class Give
 				}
 				else
 				{
-					if(CheckType.isNumber(args[2]))
+					if (CheckType.isNumber(args[2]))
 					{
-						if(NKeconomy.hasAccount(args[1]))
+						if (NKeconomy.hasAccount(args[1]))
 						{
 							NKeconomy.giveAmount(args[1], Double.parseDouble(args[2]), false);
-							if(Bukkit.getPlayer(args[1])!=null)
+							if (Bukkit.getPlayer(args[1]) != null)
 							{
 								Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GREEN + " Vous avez reçu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 							}
@@ -46,9 +46,9 @@ public class Give
 						}
 						else
 						{
-							if(args[1].equals("*"))
+							if (args[1].equals("*"))
 							{
-								NKeconomy.accounts.forEach((key, value) -> 
+								NKeconomy.accounts.forEach((key, value) ->
 								{
 									value.addAmount(Double.parseDouble(args[2]));
 									Bukkit.getPlayer(value.getPlayerUUID()).sendMessage(ChatColor.GREEN + " Vous avez reçu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
@@ -69,25 +69,24 @@ public class Give
 			}
 			return true;
 		}
-		
-		
+
 		// Command called by Console
 		if (sender instanceof ConsoleCommandSender)
 		{
 			// If no more argument
-			if(args.length == 1 || args.length == 2)
+			if (args.length == 1 || args.length == 2)
 			{
 				sender.sendMessage(ChatColor.GREEN + EcoCmd.usageCmdGive);
 				return true;
 			}
-			if(args.length == 3)
+			if (args.length == 3)
 			{
-				if(CheckType.isNumber(args[2]))
+				if (CheckType.isNumber(args[2]))
 				{
-					if(NKeconomy.hasAccount(args[1]))
+					if (NKeconomy.hasAccount(args[1]))
 					{
 						NKeconomy.giveAmount(args[1], Double.parseDouble(args[2]), false);
-						if(Bukkit.getPlayer(args[1])!=null)
+						if (Bukkit.getPlayer(args[1]) != null)
 						{
 							Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GREEN + " Vous avez reçu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 						}
@@ -95,9 +94,9 @@ public class Give
 					}
 					else
 					{
-						if(args[1].equals("*"))
+						if (args[1].equals("*"))
 						{
-							NKeconomy.accounts.forEach((key, value) -> 
+							NKeconomy.accounts.forEach((key, value) ->
 							{
 								value.addAmount(Double.parseDouble(args[2]));
 								Bukkit.getPlayer(value.getPlayerUUID()).sendMessage(ChatColor.GREEN + " Vous avez reçu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);

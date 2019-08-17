@@ -14,19 +14,19 @@ public class Pay
 	{
 
 		// Command called by a player
-		if (sender instanceof Player) 
+		if (sender instanceof Player)
 		{
 			// If no more argument
-			if(args.length == 1 || args.length == 2)
+			if (args.length == 1 || args.length == 2)
 			{
 				sender.sendMessage(ChatColor.GREEN + EcoCmd.usageCmdPay);
 				return true;
 			}
-			if(args.length == 3)
+			if (args.length == 3)
 			{
 				// Display money amount of player
 				// Check permission to display money amount of a player
-				if(!(sender.hasPermission("*") || sender.hasPermission("nkeco.*") || sender.hasPermission("nkeco.pay") || sender.hasPermission("nkeco.user") || sender.hasPermission("nkeco.admin")))
+				if (!(sender.hasPermission("*") || sender.hasPermission("nkeco.*") || sender.hasPermission("nkeco.pay") || sender.hasPermission("nkeco.user") || sender.hasPermission("nkeco.admin")))
 				{
 					// Send that the player does not have the permission
 					sender.sendMessage(ChatColor.RED + NKeconomy.PName + " Vous n'avez pas la permission !");
@@ -34,11 +34,11 @@ public class Pay
 				}
 				else
 				{
-					if(CheckType.isNumber(args[2]))
+					if (CheckType.isNumber(args[2]))
 					{
-						if(NKeconomy.hasAccount(args[1]))
+						if (NKeconomy.hasAccount(args[1]))
 						{
-							if(NKeconomy.takeAmount(sender.getName(), Double.parseDouble(args[2]), false))
+							if (NKeconomy.takeAmount(sender.getName(), Double.parseDouble(args[2]), false))
 							{
 								NKeconomy.payAmount(args[1], Double.parseDouble(args[2]), sender.getName(), false);
 								sender.sendMessage(ChatColor.GREEN + "Vous avez donné " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency + ChatColor.GREEN + " à " + ChatColor.AQUA + args[1]);
@@ -61,8 +61,7 @@ public class Pay
 			}
 			return true;
 		}
-		
-		
+
 		// Command called by Console
 		if (sender instanceof ConsoleCommandSender)
 		{
