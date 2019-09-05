@@ -28,7 +28,7 @@ public class Give
 				if (!(sender.hasPermission("*") || sender.hasPermission("nkeco.*") || sender.hasPermission("nkeco.give") || sender.hasPermission("nkeco.admin")))
 				{
 					// Send that the player does not have the permission
-					sender.sendMessage(ChatColor.RED + NKeconomy.PName + " Vous n'avez pas la permission !");
+					sender.sendMessage(ChatColor.RED + NKeconomy.PNAME + " Vous n'avez pas la permission !");
 					return true;
 				}
 				else
@@ -40,9 +40,9 @@ public class Give
 							NKeconomy.giveAmount(args[1], Double.parseDouble(args[2]), false);
 							if (Bukkit.getPlayer(args[1]) != null)
 							{
-								Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GREEN + " Vous avez reçu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
+								Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GREEN + " Vous avez reÃ§u " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 							}
-							sender.sendMessage(ChatColor.AQUA + args[1] + ChatColor.GREEN + " a reçu " + args[2] + " " + NKeconomy.currency);
+							sender.sendMessage(ChatColor.AQUA + args[1] + ChatColor.GREEN + " a reï¿½u " + args[2] + " " + NKeconomy.currency);
 						}
 						else
 						{
@@ -51,8 +51,8 @@ public class Give
 								NKeconomy.accounts.forEach((key, value) ->
 								{
 									value.addAmount(Double.parseDouble(args[2]));
-									Bukkit.getPlayer(value.getPlayerUUID()).sendMessage(ChatColor.GREEN + " Vous avez reçu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
-									sender.sendMessage(ChatColor.AQUA + value.getPlayerName() + ChatColor.GREEN + " a reçu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
+									Bukkit.getPlayer(value.getPlayerUUID()).sendMessage(ChatColor.GREEN + " Vous avez reï¿½u " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
+									sender.sendMessage(ChatColor.AQUA + value.getPlayerName() + ChatColor.GREEN + " a reï¿½u " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 								});
 							}
 							else
@@ -63,7 +63,7 @@ public class Give
 					}
 					else
 					{
-						sender.sendMessage(ChatColor.RED + "Le montant doit être un nombre");
+						sender.sendMessage(ChatColor.RED + "Le montant doit ï¿½tre un nombre");
 					}
 				}
 			}
@@ -88,9 +88,9 @@ public class Give
 						NKeconomy.giveAmount(args[1], Double.parseDouble(args[2]), false);
 						if (Bukkit.getPlayer(args[1]) != null)
 						{
-							Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GREEN + " Vous avez reçu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
+							Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GREEN + " Vous avez reï¿½u " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 						}
-						sender.sendMessage(ChatColor.AQUA + args[1] + ChatColor.GREEN + " a reçu " + args[2] + " " + NKeconomy.currency);
+						sender.sendMessage(ChatColor.AQUA + args[1] + ChatColor.GREEN + " a reï¿½u " + args[2] + " " + NKeconomy.currency);
 					}
 					else
 					{
@@ -99,8 +99,8 @@ public class Give
 							NKeconomy.accounts.forEach((key, value) ->
 							{
 								value.addAmount(Double.parseDouble(args[2]));
-								Bukkit.getPlayer(value.getPlayerUUID()).sendMessage(ChatColor.GREEN + " Vous avez reçu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
-								sender.sendMessage(ChatColor.AQUA + value.getPlayerName() + ChatColor.GREEN + " a reçu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
+								Bukkit.getPlayer(value.getPlayerUUID()).sendMessage(ChatColor.GREEN + " Vous avez reï¿½u " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
+								sender.sendMessage(ChatColor.AQUA + value.getPlayerName() + ChatColor.GREEN + " a reï¿½u " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 							});
 						}
 						else
@@ -111,14 +111,14 @@ public class Give
 				}
 				else
 				{
-					sender.sendMessage(ChatColor.RED + "Le montant doit être un nombre");
+					sender.sendMessage(ChatColor.RED + "Le montant doit ï¿½tre un nombre");
 				}
 			}
 			return true;
 		}
 		// Command does not called by player or Console
-		sender.sendMessage(ChatColor.DARK_RED + NKeconomy.PName + " An error has occured");
-		NKeconomy.getInstance().getConsole().sendMessage(ChatColor.DARK_RED + NKeconomy.PName + " An error has occured (Error#3.004)");
+		sender.sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " An error has occured");
+		NKeconomy.getPlugin().getConsole().sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " An error has occured (Error#3.004)");
 		return true;
 	}
 }

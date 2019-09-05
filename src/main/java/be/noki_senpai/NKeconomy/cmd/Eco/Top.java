@@ -1,6 +1,6 @@
 package be.noki_senpai.NKeconomy.cmd;
 
-import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.ChatColor;
@@ -23,7 +23,7 @@ public class Top
 			if (!(sender.hasPermission("*") || sender.hasPermission("nkeco.*") || sender.hasPermission("nkeco.top") || sender.hasPermission("nkeco.user") || sender.hasPermission("nkeco.admin")))
 			{
 				// Send that the player does not have the permission
-				sender.sendMessage(ChatColor.RED + NKeconomy.PName + " Vous n'avez pas la permission !");
+				sender.sendMessage(ChatColor.RED + NKeconomy.PNAME + " Vous n'avez pas la permission !");
 				return true;
 			}
 			else
@@ -43,20 +43,20 @@ public class Top
 					}
 					else
 					{
-						sender.sendMessage(ChatColor.RED + "La page doit être un nombre");
+						sender.sendMessage(ChatColor.RED + "La page doit ï¿½tre un nombre");
 						return true;
 					}
 				}
 
-				LinkedHashMap<String, Double> topAmount = NKeconomy.topAmount(page);
+				Map<String, Double> topAmount = NKeconomy.topAmount(page);
 
 				if (topAmount.size() == 0)
 				{
-					sender.sendMessage(ChatColor.RED + "Il n'y a personne à cette page du classement");
+					sender.sendMessage(ChatColor.RED + "Il n'y a personne ï¿½ cette page du classement");
 				}
 				else
 				{
-					topList = ChatColor.GREEN + "---- Top " + NKeconomy.currency + ChatColor.GREEN + " ---- " + ChatColor.AQUA + ((page - 1) * 10 + 1) + ChatColor.GREEN + " à " + ChatColor.AQUA + (page * 10) + ChatColor.GREEN + " -----------------------------";
+					topList = ChatColor.GREEN + "---- Top " + NKeconomy.currency + ChatColor.GREEN + " ---- " + ChatColor.AQUA + ((page - 1) * 10 + 1) + ChatColor.GREEN + " ï¿½ " + ChatColor.AQUA + (page * 10) + ChatColor.GREEN + " -----------------------------";
 
 					int i = ((page - 1) * 10 + 1);
 					String itsMe = "";
@@ -101,7 +101,7 @@ public class Top
 				}
 				else
 				{
-					sender.sendMessage(ChatColor.RED + "La page doit être un nombre");
+					sender.sendMessage(ChatColor.RED + "La page doit ï¿½tre un nombre");
 					return true;
 				}
 			}
@@ -132,8 +132,8 @@ public class Top
 			return true;
 		}
 		// Command does not called by player or Console
-		sender.sendMessage(ChatColor.DARK_RED + NKeconomy.PName + " An error has occured");
-		NKeconomy.getInstance().getConsole().sendMessage(ChatColor.DARK_RED + NKeconomy.PName + " An error has occured (Error#3.004)");
+		sender.sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " An error has occured");
+		NKeconomy.getPlugin().getConsole().sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " An error has occured (Error#3.004)");
 		return true;
 	}
 }

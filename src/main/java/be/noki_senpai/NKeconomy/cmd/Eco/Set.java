@@ -28,7 +28,7 @@ public class Set
 				if (!(sender.hasPermission("*") || sender.hasPermission("nkeco.*") || sender.hasPermission("nkeco.set") || sender.hasPermission("nkeco.admin")))
 				{
 					// Send that the player does not have the permission
-					sender.sendMessage(ChatColor.RED + NKeconomy.PName + " Vous n'avez pas la permission !");
+					sender.sendMessage(ChatColor.RED + NKeconomy.PNAME + " Vous n'avez pas la permission !");
 					return true;
 				}
 				else
@@ -51,7 +51,7 @@ public class Set
 					}
 					else
 					{
-						sender.sendMessage(ChatColor.RED + "Le montant doit être un nombre");
+						sender.sendMessage(ChatColor.RED + "Le montant doit Ãªtre un nombre");
 					}
 				}
 			}
@@ -83,14 +83,14 @@ public class Set
 				}
 				else
 				{
-					sender.sendMessage(ChatColor.RED + "Le montant doit être un nombre");
+					sender.sendMessage(ChatColor.RED + "Le montant doit ï¿½tre un nombre");
 				}
 			}
 			return true;
 		}
 		// Command does not called by player or Console
-		sender.sendMessage(ChatColor.DARK_RED + NKeconomy.PName + " An error has occured");
-		NKeconomy.getInstance().getConsole().sendMessage(ChatColor.DARK_RED + NKeconomy.PName + " An error has occured (Error#3.004)");
+		sender.sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " An error has occured");
+		NKeconomy.getPlugin().getConsole().sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " An error has occured (Error#3.004)");
 		return true;
 	}
 }

@@ -28,7 +28,7 @@ public class Take
 				if (!(sender.hasPermission("*") || sender.hasPermission("nkeco.*") || sender.hasPermission("nkeco.take") || sender.hasPermission("nkeco.admin")))
 				{
 					// Send that the player does not have the permission
-					sender.sendMessage(ChatColor.RED + NKeconomy.PName + " Vous n'avez pas la permission !");
+					sender.sendMessage(ChatColor.RED + NKeconomy.PNAME + " Vous n'avez pas la permission !");
 					return true;
 				}
 				else
@@ -41,7 +41,7 @@ public class Take
 							{
 								if (Bukkit.getPlayer(args[1]) != null)
 								{
-									Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GREEN + " Vous avez été prelevé de " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
+									Bukkit.getPlayer(args[1]).sendMessage(ChatColor.GREEN + " Vous avez ï¿½tï¿½ prelevï¿½ de " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 								}
 								sender.sendMessage(ChatColor.AQUA + args[1] + ChatColor.GREEN + " a perdu " + NKeconomy.format(Double.parseDouble(args[2])) + " " + NKeconomy.currency);
 							}
@@ -58,7 +58,7 @@ public class Take
 					}
 					else
 					{
-						sender.sendMessage(ChatColor.RED + "Le montant doit être un nombre");
+						sender.sendMessage(ChatColor.RED + "Le montant doit ï¿½tre un nombre");
 					}
 				}
 			}
@@ -92,7 +92,7 @@ public class Take
 							}
 							else
 							{
-								sender.sendMessage(ChatColor.DARK_RED + " " + args[1] + " est connecté(e) sur un autre serveur. Utilisez la console de ce serveur pour lui retirer des " + NKeconomy.currency);
+								sender.sendMessage(ChatColor.DARK_RED + " " + args[1] + " est connectï¿½(e) sur un autre serveur. Utilisez la console de ce serveur pour lui retirer des " + NKeconomy.currency);
 							}
 
 						}
@@ -104,14 +104,14 @@ public class Take
 				}
 				else
 				{
-					sender.sendMessage(ChatColor.RED + "Le montant doit être un nombre");
+					sender.sendMessage(ChatColor.RED + "Le montant doit ï¿½tre un nombre");
 				}
 			}
 			return true;
 		}
 		// Command does not called by player or Console
-		sender.sendMessage(ChatColor.DARK_RED + NKeconomy.PName + " An error has occured");
-		NKeconomy.getInstance().getConsole().sendMessage(ChatColor.DARK_RED + NKeconomy.PName + " An error has occured (Error#3.004)");
+		sender.sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " An error has occured");
+		NKeconomy.getPlugin().getConsole().sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " An error has occured (Error#3.004)");
 		return true;
 	}
 }
