@@ -52,10 +52,6 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	private static NKeconomy plugin;
 	private static Economy economy = null;
 
-	// Accounts datas
-
-	public static List<String> playerListServer = new ArrayList<String>();
-
 	// Fired when plugin is first enabled
 	@Override public void onEnable()
 	{

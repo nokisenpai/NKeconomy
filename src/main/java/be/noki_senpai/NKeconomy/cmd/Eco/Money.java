@@ -1,4 +1,4 @@
-package be.noki_senpai.NKeconomy.cmd;
+package be.noki_senpai.NKeconomy.cmd.Eco;
 
 import be.noki_senpai.NKeconomy.managers.AccountManager;
 import be.noki_senpai.NKeconomy.managers.ConfigManager;
@@ -86,7 +86,7 @@ public class Money
 		{
 			if (args.length == 1)
 			{
-				sender.sendMessage(ChatColor.RED + "Dans la console, veuillez specifier un joueur.");
+				sender.sendMessage(ChatColor.RED + "Veuillez spécifier un joueur.");
 				return true;
 			}
 			if (args.length == 2)

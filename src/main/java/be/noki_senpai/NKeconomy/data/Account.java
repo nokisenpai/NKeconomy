@@ -6,21 +6,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.UUID;
+import java.util.function.Function;
 
+import be.noki_senpai.NKeconomy.managers.ConfigManager;
+import be.noki_senpai.NKeconomy.managers.DatabaseManager;
+import be.noki_senpai.NKeconomy.managers.QueueManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import be.noki_senpai.NKeconomy.NKeconomy;
 
-public class Accounts
+public class Account
 {
 	private int id;
 	private UUID playerUUID;
 	private String playerName;
 	private Double amount = 0.0;
 
-	public Accounts(UUID UUID)
+	public Account(UUID UUID)
 	{
 		setPlayerUUID(UUID);
 		setPlayerName(Bukkit.getOfflinePlayer(playerUUID).getName());
@@ -32,27 +36,27 @@ public class Accounts
 
 		try
 		{
-			bdd = NKeconomy.getInstance().getConnection();
+			bdd = DatabaseManager.getConnection();
 
 			// Get 'id', 'uuid', 'name' and 'amount' from database
-			req = "SELECT id, uuid, name, amount FROM " + NKeconomy.table.get("accounts") + " WHERE uuid = ?";
+			req = "SELECT id, uuid, name, amount FROM " + DatabaseManager.table.get("accounts") + " WHERE uuid = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setString(1, getPlayerUUID().toString());
 
 			resultat = ps.executeQuery();
 
 			// If there is a result account exist
-			if (resultat.next())
+			if(resultat.next())
 			{
 				setId(resultat.getInt("id"));
 				setAmount(resultat.getDouble("amount"));
 				// If names are differents, update in database
-				if (!resultat.getString("name").equals(getPlayerName()))
+				if(!resultat.getString("name").equals(getPlayerName()))
 				{
 					ps.close();
 					resultat.close();
 
-					req = "UPDATE " + NKeconomy.table.get("accounts") + " SET name = ? WHERE id = ?";
+					req = "UPDATE " + DatabaseManager.table.get("accounts") + " SET name = ? WHERE id = ?";
 					ps = bdd.prepareStatement(req);
 					ps.setString(1, getPlayerName());
 					ps.setInt(2, getId());
@@ -66,11 +70,11 @@ public class Accounts
 				ps.close();
 				resultat.close();
 
-				req = "INSERT INTO " + NKeconomy.table.get("accounts") + " ( uuid, name, amount ) VALUES ( ? , ? , ? )";
+				req = "INSERT INTO " + DatabaseManager.table.get("accounts") + " ( uuid, name, amount ) VALUES ( ? , ? , ? )";
 				ps = bdd.prepareStatement(req, Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, getPlayerUUID().toString());
 				ps.setString(2, getPlayerName());
-				ps.setDouble(3, NKeconomy.startAmount);
+				ps.setDouble(3, ConfigManager.STARTAMOUNT);
 
 				ps.executeUpdate();
 				resultat = ps.getGeneratedKeys();
@@ -78,15 +82,15 @@ public class Accounts
 				resultat.next();
 				setId(resultat.getInt(1));
 
-				setAmount(NKeconomy.startAmount);
+				setAmount(ConfigManager.STARTAMOUNT);
 
 				ps.close();
 				resultat.close();
 			}
 		}
-		catch (SQLException e)
+		catch(SQLException e)
 		{
-			NKeconomy.getInstance().getConsole().sendMessage(ChatColor.DARK_RED + NKeconomy.PName + " Error while setting a player. (Error#data.Players.000)");
+			Bukkit.getConsoleSender().sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " Error while setting a player. (Error#data.Players.000)");
 			e.printStackTrace();
 		}
 	}
@@ -157,34 +161,27 @@ public class Accounts
 	// Save amount
 	// ######################################
 
-	public void save()
+	public void save(QueueManager queueManager)
 	{
-		new BukkitRunnable()
+		Connection bdd = null;
+		PreparedStatement ps = null;
+		String req = null;
+
+		try
 		{
-			@Override
-			public void run()
-			{
-				Connection bdd = null;
-				PreparedStatement ps = null;
-				String req = null;
+			bdd = DatabaseManager.getConnection();
 
-				try
-				{
-					bdd = NKeconomy.getInstance().getConnection();
+			req = "UPDATE " + DatabaseManager.table.get("accounts") + " SET amount = ? WHERE uuid = ?";
+			ps = bdd.prepareStatement(req);
+			ps.setDouble(1, getAmount());
+			ps.setString(2, getPlayerUUID().toString());
 
-					req = "UPDATE " + NKeconomy.table.get("accounts") + " SET amount = ? WHERE uuid = ?";
-					ps = bdd.prepareStatement(req);
-					ps.setDouble(1, getAmount());
-					ps.setString(2, getPlayerUUID().toString());
-
-					ps.executeUpdate();
-					ps.close();
-				}
-				catch (SQLException e)
-				{
-					e.printStackTrace();
-				}
-			}
-		}.runTaskAsynchronously(NKeconomy.getInstance());
+			ps.executeUpdate();
+			ps.close();
+		}
+		catch(SQLException e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

@@ -1,17 +1,10 @@
-package be.noki_senpai.NKhome.managers;
+package be.noki_senpai.NKeconomy.managers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
+import be.noki_senpai.NKeconomy.NKeconomy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
-
-import be.noki_senpai.NKhome.NKhome;
 
 public class ConfigManager
 {
@@ -27,9 +20,8 @@ public class ConfigManager
 	public static String PREFIX = null;
 	public static String SERVERNAME = null;
 
-	private Map<String, Integer> ranks = new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
-	private Map<String, String> convertGroup = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
-	private List<String> convertIgnore = new ArrayList<String>();
+	public static double STARTAMOUNT = -1;
+	public static String CURRENCY = null;
 
 	// Constructor
 	public ConfigManager(FileConfiguration config)
@@ -43,7 +35,7 @@ public class ConfigManager
 		// Check if "use-mysql" is to true. Plugin only use MySQL database.
 		if(!config.getBoolean("use-mysql"))
 		{
-			console.sendMessage(ChatColor.DARK_RED + NKhome.PNAME
+			console.sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME
 					+ " Disabled because this plugin only use MySQL database. Please set to true the 'use-mysql' field in config.yml");
 			return false;
 		}
@@ -56,37 +48,13 @@ public class ConfigManager
 		dbPassword = config.getString("password");
 
 		// Get prefix used for table name on database
-		PREFIX = config.getString("table-prefix", "NKhome_");
+		PREFIX = config.getString("table-prefix", "NKeco_");
 
 		// Get server name gave to bungeecord config
 		SERVERNAME = config.getString("server-name", "world");
 
-		// Get max home per ranks
-		ConfigurationSection rankSection = config.getConfigurationSection("ranks");
-
-		for(String key : rankSection.getKeys(false))
-		{
-			ranks.put(key, config.getInt("ranks." + key));
-		}
-
-		if(ranks.size() == 0)
-		{
-			console.sendMessage(ChatColor.DARK_RED + NKhome.PNAME + " No rank found in config.yml.");
-		}
-
-		// Get servers structure for conversion from Essentials
-		ConfigurationSection convertGroupSection = config.getConfigurationSection("convert-group");
-
-		for(String server : convertGroupSection.getKeys(false))
-		{
-			for(String world : config.getStringList("convert-group." + server))
-			{
-				convertGroup.put(world, server);
-			}
-		}
-
-		// Get ignored worlds for conversion from Essentials
-		convertIgnore = config.getStringList("convert-ignore");
+		STARTAMOUNT = config.getDouble("start-amount", 100);
+		CURRENCY = config.getString("currency", "€").replace("&", "§");
 
 		return true;
 	}
@@ -118,20 +86,5 @@ public class ConfigManager
 	public String getDbPassword()
 	{
 		return dbPassword;
-	}
-
-	public Map<String, Integer> getRanks()
-	{
-		return ranks;
-	}
-
-	public Map<String, String> getConvertGroup()
-	{
-		return convertGroup;
-	}
-
-	public List<String> getConvertIgnore()
-	{
-		return convertIgnore;
 	}
 }

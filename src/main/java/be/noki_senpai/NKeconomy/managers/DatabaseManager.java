@@ -1,19 +1,14 @@
-package be.noki_senpai.NKhome.managers;
+package be.noki_senpai.NKeconomy.managers;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
-
+import be.noki_senpai.NKeconomy.NKeconomy;
+import be.noki_senpai.NKeconomy.utils.SQLConnect;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
 
-import be.noki_senpai.NKhome.NKhome;
-import be.noki_senpai.NKhome.utils.SQLConnect;
+import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DatabaseManager
 {
@@ -32,9 +27,8 @@ public class DatabaseManager
 	public boolean loadDatabase()
 	{
 		// Save table name
-		table.put("homes", ConfigManager.PREFIX + "homes");
-		table.put("players_datas", ConfigManager.PREFIX + "players_datas");
-		table.put("players", "NK_players");
+		table.put("accounts", ConfigManager.PREFIX + "accounts");
+		table.put("cross_server", "NK_cross_server");
 
 		// Setting database informations
 		SQLConnect.setInfo(configManager.getDbHost(), configManager.getDbPort(), configManager.getDbName(), configManager.getDbUser(), configManager.getDbPassword());
@@ -47,7 +41,7 @@ public class DatabaseManager
 		catch(SQLException e)
 		{
 			bdd = null;
-			console.sendMessage(ChatColor.DARK_RED + NKhome.PNAME
+			console.sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME
 					+ " Error while attempting database connexion. Verify your access informations in config.yml");
 			e.printStackTrace();
 			return false;
@@ -65,7 +59,7 @@ public class DatabaseManager
 		}
 		catch(SQLException e)
 		{
-			console.sendMessage(ChatColor.DARK_RED + NKhome.PNAME + " Error while creating database structure. (Error#A.2.002)");
+			console.sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " Error while creating database structure. (Error#A.2.002)");
 			return false;
 		}
 
@@ -99,47 +93,47 @@ public class DatabaseManager
 			ps = bdd.prepareStatement(req);
 			resultat = ps.executeQuery();
 			int count = 0;
-			while(resultat.next())
+			while (resultat.next())
 			{
 				count++;
 			}
 
 			// if all tables are missing
-			if(count == 0)
+			if (count == 0)
 			{
-				console.sendMessage(ChatColor.GREEN + NKhome.PNAME + " Missing table(s). First start.");
+				console.sendMessage(ChatColor.GREEN + NKeconomy.PNAME + " Missing table(s). First start.");
 				return false;
 			}
 			resultat.close();
 			ps.close();
 
-			req = "SHOW TABLES FROM " + configManager.getDbName() + " LIKE 'NK_players'";
+			req = "SHOW TABLES FROM " + configManager.getDbName() + " LIKE 'NK_cross_server'";
 			ps = bdd.prepareStatement(req);
 			resultat = ps.executeQuery();
-			if(resultat.next())
+			if (resultat.next())
 			{
 				count++;
 			}
 
 			// if 1 or more tables are missing
-			if(count < table.size())
+			if (count < table.size())
 			{
-				console.sendMessage(ChatColor.DARK_RED + NKhome.PNAME
-						+ " Missing table(s). Please don't alter tables name or structure in database. (Error#main.Storage.002)");
+				console.sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " Missing table(s). Please don't alter tables name or structure in database. (Error#main.Storage.002)");
 				return false;
 			}
 		}
-		catch(SQLException e1)
+		catch (SQLException e1)
 		{
-			console.sendMessage(ChatColor.DARK_RED + NKhome.PNAME + " Error while testing existance of tables. (Error#main.Storage.003)");
+			console.sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " Error while testing existance of tables. (Error#main.Storage.003)");
+			NKeconomy.getPlugin().disablePlugin();
 		}
 		finally
 		{
-			if(ps != null)
+			if (ps != null)
 			{
 				ps.close();
 			}
-			if(resultat != null)
+			if (resultat != null)
 			{
 				resultat.close();
 			}
@@ -157,41 +151,27 @@ public class DatabaseManager
 			String req = null;
 			Statement s = null;
 
-			console.sendMessage(ChatColor.GREEN + NKhome.PNAME + " Creating Database structure ...");
+			console.sendMessage(ChatColor.GREEN + NKeconomy.PNAME + " Creating Database structure ...");
 
 			try
 			{
-				// Creating players table
-				req = "CREATE TABLE IF NOT EXISTS `" + table.get("players") + "` (" + "`id` int(11) NOT NULL AUTO_INCREMENT,"
-						+ "`uuid` varchar(40) NOT NULL," + "`name` varchar(40) NOT NULL," + "PRIMARY KEY (`id`),"
-						+ "UNIQUE KEY `uuid_unique` (`uuid`) USING BTREE" + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+				// Creating accounts table
+				req = "CREATE TABLE IF NOT EXISTS `" + table.get("accounts") + "` (" + "`id` int(11) NOT NULL AUTO_INCREMENT," + "`uuid` varchar(40) NOT NULL," + "`name` varchar(40) NOT NULL," + "`amount` double NOT NULL," + "PRIMARY KEY (`id`)," + "UNIQUE KEY `uuid_unique` (`uuid`) USING BTREE" + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 				s = bdd.createStatement();
 				s.execute(req);
 				s.close();
 
-				// Creating players_datas table
-				req = "CREATE TABLE IF NOT EXISTS `" + table.get("players_datas") + "` (" + "`id` int(11) NOT NULL AUTO_INCREMENT,"
-						+ "`player_id` int(11) NOT NULL," + "`bonus` int(11) NOT NULL," + "`home_tp` int(11)," + "PRIMARY KEY (`id`)"
-						+ ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+				// Creating cross_server table
+				req = "CREATE TABLE IF NOT EXISTS `" + table.get("cross_server") + "` (" + "`id` int(11) NOT NULL AUTO_INCREMENT," + "`name` varchar(40) NOT NULL," + "`server` varchar(120) NOT NULL," + "PRIMARY KEY (`id`)" + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 				s = bdd.createStatement();
 				s.execute(req);
 				s.close();
 
-				// Creating homes table
-				req = "CREATE TABLE IF NOT EXISTS `" + table.get("homes") + "` (" + "`id` int(11) NOT NULL AUTO_INCREMENT,"
-						+ "`player_id` int(11) NOT NULL," + "`server` varchar(40) NOT NULL," + "`name` varchar(40) NOT NULL,"
-						+ "`world` varchar(40) NOT NULL," + "`x` double NOT NULL," + "`y` double NOT NULL," + "`z` double NOT NULL,"
-						+ "`pitch` float NOT NULL," + "`yaw` float NOT NULL," + "PRIMARY KEY (`id`),"
-						+ "UNIQUE INDEX `home_player_id_name_UNIQUE` (`player_id` ASC, `name` ASC)" + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-				s = bdd.createStatement();
-				s.execute(req);
-				s.close();
-
-				console.sendMessage(ChatColor.GREEN + NKhome.PNAME + " Database structure created.");
+				console.sendMessage(ChatColor.GREEN + NKeconomy.PNAME + " Database structure created.");
 			}
 			catch(SQLException e)
 			{
-				console.sendMessage(ChatColor.DARK_RED + NKhome.PNAME + " Error while creating database structure. (Error#main.Storage.000)");
+				console.sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " Error while creating database structure. (Error#main.Storage.000)");
 				e.printStackTrace();
 			}
 			finally
@@ -204,7 +184,7 @@ public class DatabaseManager
 		}
 		catch(SQLException e)
 		{
-			console.sendMessage(ChatColor.DARK_RED + NKhome.PNAME + " Error while creating database structure. (Error#main.Storage.001)");
+			console.sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " Error while creating database structure. (Error#main.Storage.001)");
 		}
 	}
 

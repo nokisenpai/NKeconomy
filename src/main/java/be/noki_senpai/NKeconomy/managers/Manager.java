@@ -1,27 +1,25 @@
-package be.noki_senpai.NKhome.managers;
+package be.noki_senpai.NKeconomy.managers;
 
+import be.noki_senpai.NKeconomy.NKeconomy;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
-
-import be.noki_senpai.NKhome.NKhome;
-
-import java.util.Queue;
 
 public class Manager
 {
 	private ConsoleCommandSender console = null;
+	private QueueManager queueManager = null;
 	private ConfigManager configManager = null;
 	private DatabaseManager databaseManager = null;
-	private HomeManager homeManager = null;
-	private QueueManager queueManager = null;
+	private AccountManager accountManager = null;
 
-	public Manager(NKhome instance)
+
+	public Manager(NKeconomy instance)
 	{
 		console = Bukkit.getConsoleSender();
+		queueManager = new QueueManager();
 		configManager = new ConfigManager(instance.getConfig());
 		databaseManager = new DatabaseManager(configManager);
-		homeManager = new HomeManager();
-		queueManager = new QueueManager();
+		accountManager = new AccountManager(queueManager);
 	}
 
 	// ######################################
@@ -32,6 +30,12 @@ public class Manager
 	public ConsoleCommandSender getConsole()
 	{
 		return console;
+	}
+
+	// QueueManager
+	public QueueManager getQueueManager()
+	{
+		return queueManager;
 	}
 
 	// PluginManager
@@ -47,14 +51,8 @@ public class Manager
 	}
 
 	// PlayerManager
-	public HomeManager getHomeManager()
+	public AccountManager getAccountManager()
 	{
-		return homeManager;
-	}
-
-	// QueueManager
-	public QueueManager getQueueManager()
-	{
-		return queueManager;
+		return accountManager;
 	}
 }

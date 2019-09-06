@@ -1,5 +1,6 @@
-package be.noki_senpai.NKeconomy.cmd;
+package be.noki_senpai.NKeconomy.cmd.Eco;
 
+import be.noki_senpai.NKeconomy.cmd.EcoCmd;
 import be.noki_senpai.NKeconomy.managers.AccountManager;
 import be.noki_senpai.NKeconomy.managers.ConfigManager;
 import be.noki_senpai.NKeconomy.managers.QueueManager;
@@ -60,7 +61,7 @@ public class Pay
 									if (accountManager.takeAmount(sender.getName(), Double.parseDouble(args[2]), false))
 									{
 										accountManager.payAmount(args[1], Double.parseDouble(args[2]), sender.getName(), false);
-										sender.sendMessage(ChatColor.GREEN + "Vous avez donné " + accountManager.format(Double.parseDouble(args[2])) + " " + ConfigManager.CURRENCY + ChatColor.GREEN + " � " + ChatColor.AQUA + args[1]);
+										sender.sendMessage(ChatColor.GREEN + "Vous avez donné " + accountManager.format(Double.parseDouble(args[2])) + " " + ConfigManager.CURRENCY + ChatColor.GREEN + " à " + ChatColor.AQUA + args[1]);
 									}
 									else
 									{

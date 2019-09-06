@@ -1,6 +1,6 @@
-package be.noki_senpai.NKhome.managers;
+package be.noki_senpai.NKeconomy.managers;
 
-import be.noki_senpai.NKhome.NKhome;
+import be.noki_senpai.NKeconomy.NKeconomy;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -23,7 +23,7 @@ public class QueueManager
 
 			}
 		};
-		runnableAsync.runTask(NKhome.getPlugin());
+		runnableAsync.runTask(NKeconomy.getPlugin());
 	}
 
 	public void addToQueue(Function async)
@@ -51,7 +51,7 @@ public class QueueManager
 					}
 				}
 			};
-			runnableAsync.runTaskAsynchronously(NKhome.getPlugin());
+			runnableAsync.runTaskAsynchronously(NKeconomy.getPlugin());
 		}
 	}
 }
