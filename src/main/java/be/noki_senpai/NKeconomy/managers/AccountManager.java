@@ -499,7 +499,7 @@ public class AccountManager
 	public boolean takeAmount(final String playerName, double amount_, boolean crossServer)
 	{
 		final double amount = round(amount_);
-		if(getBalance(playerName) >= amount)
+		if(round(getBalance(playerName)) >= amount)
 		{
 			if(accounts.containsKey(playerName))
 			{
