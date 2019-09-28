@@ -22,6 +22,7 @@ public class Account
 	private int id;
 	private UUID playerUUID;
 	private String playerName;
+	private int accountId;
 	private Double amount = 0.0;
 
 	public Account(UUID UUID)
@@ -38,8 +39,8 @@ public class Account
 		{
 			bdd = DatabaseManager.getConnection();
 
-			// Get 'id', 'uuid', 'name' and 'amount' from database
-			req = "SELECT id, uuid, name, amount FROM " + DatabaseManager.table.get("accounts") + " WHERE uuid = ?";
+			// Get 'id', 'uuid', 'name' from database
+			req = "SELECT p.id, uuid, name, a.id AS account_id, amount FROM " + DatabaseManager.table.PLAYERS + " p LEFT JOIN " + DatabaseManager.table.ACCOUNTS + " a ON p.id = a.player_id WHERE uuid = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setString(1, getPlayerUUID().toString());
 
@@ -49,38 +50,80 @@ public class Account
 			if(resultat.next())
 			{
 				setId(resultat.getInt("id"));
-				setAmount(resultat.getDouble("amount"));
-				// If names are differents, update in database
-				if(!resultat.getString("name").equals(getPlayerName()))
+				String tmpName = resultat.getString("name");
+				if(resultat.getDouble("account_id") == 0)
 				{
 					ps.close();
 					resultat.close();
 
-					req = "UPDATE " + DatabaseManager.table.get("accounts") + " SET name = ? WHERE id = ?";
-					ps = bdd.prepareStatement(req);
-					ps.setString(1, getPlayerName());
-					ps.setInt(2, getId());
+					//Add new account on database
+					req = "INSERT INTO " + DatabaseManager.table.ACCOUNTS + " ( player_id, amount ) VALUES ( ? , ? )";
+					ps = bdd.prepareStatement(req, Statement.RETURN_GENERATED_KEYS);
+					ps.setDouble(1, getId());
+					ps.setDouble(2, 10000);
 
 					ps.executeUpdate();
+					resultat = ps.getGeneratedKeys();
+
+					resultat.next();
+					setAccountId(resultat.getInt(1));
+
+					setAmount((double) 10000);
+				}
+				else
+				{
+					setAccountId(resultat.getInt("account_id"));
+					setAmount(resultat.getDouble("amount"));
+				}
+
+				ps.close();
+				resultat.close();
+
+				if(NKeconomy.managePlayerDb)
+				{
+					// If names are differents, update in database
+					if(!tmpName.equals(getPlayerName()))
+					{
+						req = "UPDATE " + DatabaseManager.table.ACCOUNTS + " SET name = ? WHERE id = ?";
+						ps = bdd.prepareStatement(req);
+						ps.setString(1, getPlayerName());
+						ps.setInt(2, getId());
+
+						ps.executeUpdate();
+
+						ps.close();
+						resultat.close();
+					}
 				}
 			}
 			else
 			{
-				// Add new player on database
-				ps.close();
-				resultat.close();
-
-				req = "INSERT INTO " + DatabaseManager.table.get("accounts") + " ( uuid, name, amount ) VALUES ( ? , ? , ? )";
+				//Add new player on database
+				req = "INSERT INTO " + DatabaseManager.table.PLAYERS + " ( uuid, name) VALUES ( ? , ? ) ON DUPLICATE KEY UPDATE id = id";
 				ps = bdd.prepareStatement(req, Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, getPlayerUUID().toString());
 				ps.setString(2, getPlayerName());
-				ps.setDouble(3, ConfigManager.STARTAMOUNT);
-
 				ps.executeUpdate();
 				resultat = ps.getGeneratedKeys();
 
 				resultat.next();
 				setId(resultat.getInt(1));
+
+				ps.close();
+				resultat.close();
+
+				//Add new account on database
+				//Add new account on database
+				req = "INSERT INTO " + DatabaseManager.table.ACCOUNTS + " ( player_id, amount ) VALUES ( ? , ? )";
+				ps = bdd.prepareStatement(req, Statement.RETURN_GENERATED_KEYS);
+				ps.setDouble(1, getId());
+				ps.setDouble(2, ConfigManager.STARTAMOUNT);
+
+				ps.executeUpdate();
+				resultat = ps.getGeneratedKeys();
+
+				resultat.next();
+				setAccountId(resultat.getInt(1));
 
 				setAmount(ConfigManager.STARTAMOUNT);
 
@@ -132,6 +175,17 @@ public class Account
 		this.playerName = playerName;
 	}
 
+	// Getter & Setter 'accountId'
+	public int getAccountId()
+	{
+		return accountId;
+	}
+
+	public void setAccountId(int accountId)
+	{
+		this.accountId = accountId;
+	}
+
 	// Getter & Setter 'amount'
 	public double getAmount()
 	{
@@ -171,10 +225,10 @@ public class Account
 		{
 			bdd = DatabaseManager.getConnection();
 
-			req = "UPDATE " + DatabaseManager.table.get("accounts") + " SET amount = ? WHERE uuid = ?";
+			req = "UPDATE " + DatabaseManager.table.ACCOUNTS + " SET amount = ? WHERE id = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setDouble(1, getAmount());
-			ps.setString(2, getPlayerUUID().toString());
+			ps.setInt(2, accountId);
 
 			ps.executeUpdate();
 			ps.close();

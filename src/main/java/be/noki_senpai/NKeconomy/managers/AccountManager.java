@@ -67,7 +67,7 @@ public class AccountManager
 	public void loadAccount()
 	{
 		// Get all connected players
-		Bukkit.getOnlinePlayers().forEach(player -> accounts.put(player.getDisplayName(), new Account(player.getUniqueId())));
+		Bukkit.getOnlinePlayers().forEach(player -> accounts.put(player.getName(), new Account(player.getUniqueId())));
 	}
 
 	public void unloadAccout()
@@ -118,7 +118,7 @@ public class AccountManager
 
 			accounts.forEach((key, value) -> {
 				tmp1 += "WHEN " + value.getId() + " THEN " + value.getAmount() + " ";
-				tmp2 += value.getId() + ",";
+				tmp2 += value.getAccountId() + ",";
 			});
 
 			tmp2 += "-1)";
@@ -126,7 +126,7 @@ public class AccountManager
 			try
 			{
 				bdd = DatabaseManager.getConnection();
-				req = "UPDATE " + DatabaseManager.table.get("accounts") + " SET amount = CASE id " + tmp1 + "ELSE amount END WHERE id IN" + tmp2;
+				req = "UPDATE " + DatabaseManager.table.ACCOUNTS + " SET amount = CASE id " + tmp1 + "ELSE amount END WHERE id IN" + tmp2;
 				ps = bdd.prepareStatement(req);
 				ps.executeUpdate();
 				ps.close();
@@ -157,7 +157,7 @@ public class AccountManager
 		{
 			bdd = DatabaseManager.getConnection();
 
-			req = "SELECT amount FROM " + DatabaseManager.table.get("accounts") + " WHERE name = ?";
+			req = "SELECT amount FROM " + DatabaseManager.table.PLAYERS + " p LEFT JOIN " + DatabaseManager.table.ACCOUNTS + " a ON p.id = a.player_id WHERE name = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setString(1, playerName);
 
@@ -206,7 +206,7 @@ public class AccountManager
 		{
 			bdd = DatabaseManager.getConnection();
 
-			req = "SELECT COUNT(id) FROM " + DatabaseManager.table.get("accounts") + " WHERE name = ?";
+			req = "SELECT COUNT(p.id) FROM " + DatabaseManager.table.PLAYERS + " p LEFT JOIN " + DatabaseManager.table.ACCOUNTS + " a ON p.id = a.player_id WHERE name = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setString(1, playerName);
 
@@ -264,7 +264,7 @@ public class AccountManager
 		{
 			bdd = DatabaseManager.getConnection();
 
-			req = "UPDATE " + DatabaseManager.table.get("accounts") + " SET amount = amount + ? WHERE name = ?";
+			req = "UPDATE " + DatabaseManager.table.PLAYERS + " p LEFT JOIN " + DatabaseManager.table.ACCOUNTS + " a ON p.id = a.player_id SET amount = amount + ? WHERE name = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setDouble(1, amount);
 			ps.setString(2, playerName);
@@ -348,7 +348,7 @@ public class AccountManager
 		{
 			bdd = DatabaseManager.getConnection();
 
-			req = "UPDATE " + DatabaseManager.table.get("accounts") + " SET amount = amount + ? WHERE name = ?";
+			req = "UPDATE " + DatabaseManager.table.PLAYERS + " p LEFT JOIN " + DatabaseManager.table.ACCOUNTS + " a ON p.id = a.player_id SET amount = amount + ? WHERE name = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setDouble(1, amount);
 			ps.setString(2, playerName);
@@ -439,7 +439,7 @@ public class AccountManager
 		{
 			bdd = DatabaseManager.getConnection();
 
-			req = "UPDATE " + DatabaseManager.table.get("accounts") + " SET amount = amount - ? WHERE name = ?";
+			req = "UPDATE " + DatabaseManager.table.PLAYERS + " p LEFT JOIN " + DatabaseManager.table.ACCOUNTS + " a ON p.id = a.player_id SET amount = amount - ? WHERE name = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setDouble(1, amount);
 			ps.setString(2, playerName);
@@ -544,7 +544,7 @@ public class AccountManager
 		{
 			bdd = DatabaseManager.getConnection();
 
-			req = "UPDATE " + DatabaseManager.table.get("accounts") + " SET amount = ? WHERE name = ?";
+			req = "UPDATE " + DatabaseManager.table.PLAYERS + " p LEFT JOIN " + DatabaseManager.table.ACCOUNTS + " a ON p.id = a.player_id SET amount = ? WHERE name = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setDouble(1, amount);
 			ps.setString(2, playerName);
@@ -634,7 +634,7 @@ public class AccountManager
 			{
 				bdd = DatabaseManager.getConnection();
 
-				req = "SELECT name, amount FROM " + DatabaseManager.table.get("accounts") + " ORDER BY amount DESC LIMIT ?, 10";
+				req = "SELECT name, amount FROM " + DatabaseManager.table.PLAYERS + " p LEFT JOIN " + DatabaseManager.table.ACCOUNTS + " a ON p.id = a.player_id ORDER BY amount DESC LIMIT ?, 10";
 				ps = bdd.prepareStatement(req);
 				ps.setInt(1, (page - 1) * 10);
 				resultat = ps.executeQuery();
@@ -701,7 +701,7 @@ public class AccountManager
 		{
 			bdd = DatabaseManager.getConnection();
 
-			req = "DELETE FROM " + DatabaseManager.table.get("cross_server") + " WHERE server = ?";
+			req = "DELETE FROM " + DatabaseManager.table.PLAYERS + " WHERE server = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setString(1, ConfigManager.SERVERNAME);
 
@@ -726,7 +726,7 @@ public class AccountManager
 		{
 			bdd = DatabaseManager.getConnection();
 
-			req = "SELECT server FROM " + DatabaseManager.table.get("cross_server") + " WHERE name = ?";
+			req = "SELECT server FROM " + DatabaseManager.table.PLAYERS + " WHERE name = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setString(1, playername);
 
@@ -763,10 +763,10 @@ public class AccountManager
 		{
 			bdd = DatabaseManager.getConnection();
 
-			req = "INSERT INTO " + DatabaseManager.table.get("cross_server") + " ( name, server ) VALUES ( ? , ? )";
+			req = "UPDATE " + DatabaseManager.table.PLAYERS + " SET server = ? WHERE name = ?";
 			ps = bdd.prepareStatement(req);
-			ps.setString(1, playername);
-			ps.setString(2, ConfigManager.SERVERNAME);
+			ps.setString(1, ConfigManager.SERVERNAME);
+			ps.setString(2, playername);
 
 			ps.execute();
 			ps.close();
@@ -788,10 +788,9 @@ public class AccountManager
 		{
 			bdd = DatabaseManager.getConnection();
 
-			req = "DELETE FROM " + DatabaseManager.table.get("cross_server") + " WHERE name = ? AND server = ?";
+			req = "UPDATE " + DatabaseManager.table.PLAYERS + " SET server = NULL WHERE name = ?";
 			ps = bdd.prepareStatement(req);
 			ps.setString(1, playername);
-			ps.setString(2, ConfigManager.SERVERNAME);
 
 			ps.execute();
 			ps.close();

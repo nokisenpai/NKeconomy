@@ -1,5 +1,6 @@
 package be.noki_senpai.NKeconomy.listeners;
 
+import be.noki_senpai.NKeconomy.NKeconomy;
 import be.noki_senpai.NKeconomy.managers.AccountManager;
 import be.noki_senpai.NKeconomy.managers.QueueManager;
 import org.bukkit.event.EventHandler;
@@ -30,7 +31,10 @@ public class PlayerConnectionListener implements Listener
 			@Override public Object apply(Object o)
 			{
 				accountManager.addAccount(event.getPlayer());
-				accountManager.addOtherServer(event.getPlayer().getName());
+				if(NKeconomy.managePlayerDb)
+				{
+					accountManager.addOtherServer(event.getPlayer().getName());
+				}
 				return null;
 			}
 		});
@@ -45,11 +49,13 @@ public class PlayerConnectionListener implements Listener
 			@Override public Object apply(Object o)
 			{
 				accountManager.getAccount(playerName).save(queueManager);
-				accountManager.removeOtherServer(playerName);
+				if(NKeconomy.managePlayerDb)
+				{
+					accountManager.removeOtherServer(playerName);
+				}
 				accountManager.delAccount(playerName);
 				return null;
 			}
 		});
-
 	}
 }

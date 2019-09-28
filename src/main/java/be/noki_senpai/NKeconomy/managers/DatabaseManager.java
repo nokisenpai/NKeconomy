@@ -13,7 +13,6 @@ import java.util.Map;
 public class DatabaseManager
 {
 	private static Connection bdd = null;
-	public static Map<String, String> table = new HashMap<>();
 
 	private ConsoleCommandSender console = null;
 	private ConfigManager configManager = null;
@@ -24,12 +23,30 @@ public class DatabaseManager
 		this.configManager = configManager;
 	}
 
+	public enum table
+	{
+		ACCOUNTS(ConfigManager.PREFIX + "accounts"), PLAYERS("NK_players");
+
+		private String name = "";
+
+		table(String name)
+		{
+			this.name = name;
+		}
+
+		public String toString()
+		{
+			return name;
+		}
+
+		public static int size()
+		{
+			return 2;
+		}
+	}
+
 	public boolean loadDatabase()
 	{
-		// Save table name
-		table.put("accounts", ConfigManager.PREFIX + "accounts");
-		table.put("cross_server", "NK_cross_server");
-
 		// Setting database informations
 		SQLConnect.setInfo(configManager.getDbHost(), configManager.getDbPort(), configManager.getDbName(), configManager.getDbUser(), configManager.getDbPassword());
 
@@ -93,13 +110,13 @@ public class DatabaseManager
 			ps = bdd.prepareStatement(req);
 			resultat = ps.executeQuery();
 			int count = 0;
-			while (resultat.next())
+			while(resultat.next())
 			{
 				count++;
 			}
 
 			// if all tables are missing
-			if (count == 0)
+			if(count == 0)
 			{
 				console.sendMessage(ChatColor.GREEN + NKeconomy.PNAME + " Missing table(s). First start.");
 				return false;
@@ -110,30 +127,31 @@ public class DatabaseManager
 			req = "SHOW TABLES FROM " + configManager.getDbName() + " LIKE 'NK_cross_server'";
 			ps = bdd.prepareStatement(req);
 			resultat = ps.executeQuery();
-			if (resultat.next())
+			if(resultat.next())
 			{
 				count++;
 			}
 
 			// if 1 or more tables are missing
-			if (count < table.size())
+			if(count < table.size())
 			{
-				console.sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " Missing table(s). Please don't alter tables name or structure in database. (Error#main.Storage.002)");
+				console.sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME
+						+ " Missing table(s). Please don't alter tables name or structure in database. (Error#main.Storage.002)");
 				return false;
 			}
 		}
-		catch (SQLException e1)
+		catch(SQLException e1)
 		{
 			console.sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " Error while testing existance of tables. (Error#main.Storage.003)");
 			NKeconomy.getPlugin().disablePlugin();
 		}
 		finally
 		{
-			if (ps != null)
+			if(ps != null)
 			{
 				ps.close();
 			}
-			if (resultat != null)
+			if(resultat != null)
 			{
 				resultat.close();
 			}
@@ -155,14 +173,18 @@ public class DatabaseManager
 
 			try
 			{
-				// Creating accounts table
-				req = "CREATE TABLE IF NOT EXISTS `" + table.get("accounts") + "` (" + "`id` int(11) NOT NULL AUTO_INCREMENT," + "`uuid` varchar(40) NOT NULL," + "`name` varchar(40) NOT NULL," + "`amount` double NOT NULL," + "PRIMARY KEY (`id`)," + "UNIQUE KEY `uuid_unique` (`uuid`) USING BTREE" + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+				// Creating players table
+				req = "CREATE TABLE IF NOT EXISTS `" + table.PLAYERS + "` (`id` int(11) NOT NULL AUTO_INCREMENT,"
+						+ "`uuid` varchar(40) NOT NULL,`name` varchar(40) NOT NULL,`server` varchar(40) ,PRIMARY KEY (`id`),"
+						+ "UNIQUE KEY `uuid_unique` (`uuid`) USING BTREE) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 				s = bdd.createStatement();
 				s.execute(req);
 				s.close();
 
-				// Creating cross_server table
-				req = "CREATE TABLE IF NOT EXISTS `" + table.get("cross_server") + "` (" + "`id` int(11) NOT NULL AUTO_INCREMENT," + "`name` varchar(40) NOT NULL," + "`server` varchar(120) NOT NULL," + "PRIMARY KEY (`id`)" + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+				// Creating accounts table
+				req = "CREATE TABLE IF NOT EXISTS `" + table.ACCOUNTS + "` (`id` int(11) NOT NULL AUTO_INCREMENT,"
+						+ "`player_id` int(11) NOT NULL,`amount` double NOT NULL,PRIMARY KEY (`id`),"
+						+ "UNIQUE KEY `uuid_unique` (`uuid`) USING BTREE) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 				s = bdd.createStatement();
 				s.execute(req);
 				s.close();
