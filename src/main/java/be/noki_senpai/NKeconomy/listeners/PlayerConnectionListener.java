@@ -1,28 +1,61 @@
 package be.noki_senpai.NKeconomy.listeners;
 
-import org.bukkit.Bukkit;
+import be.noki_senpai.NKeconomy.NKeconomy;
+import be.noki_senpai.NKeconomy.managers.AccountManager;
+import be.noki_senpai.NKeconomy.managers.QueueManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import be.noki_senpai.NKeconomy.NKeconomy;
-import be.noki_senpai.NKeconomy.data.Accounts;;
+import java.util.function.Function;
+
+;
 
 public class PlayerConnectionListener implements Listener
 {
+	private AccountManager accountManager = null;
+	private QueueManager queueManager = null;
+
+	public PlayerConnectionListener(QueueManager queueManager, AccountManager accountManager)
+	{
+		this.accountManager = accountManager;
+		this.queueManager = queueManager;
+	}
+
 	@EventHandler
 	public void PlayerJoinEvent(final PlayerJoinEvent event)
 	{
-		NKeconomy.accounts.putIfAbsent(event.getPlayer().getName(), new Accounts(event.getPlayer().getUniqueId()));
-		NKeconomy.addOtherServer(event.getPlayer().getName());
+		queueManager.addToQueue(new Function()
+		{
+			@Override public Object apply(Object o)
+			{
+				accountManager.addAccount(event.getPlayer());
+				if(NKeconomy.managePlayerDb)
+				{
+					accountManager.addOtherServer(event.getPlayer().getName());
+				}
+				return null;
+			}
+		});
 	}
 
 	@EventHandler
 	public void onPlayerQuitEvent(final PlayerQuitEvent event)
 	{
-		NKeconomy.accounts.get(Bukkit.getOfflinePlayer(event.getPlayer().getUniqueId()).getName()).save();
-		NKeconomy.accounts.remove(Bukkit.getOfflinePlayer(event.getPlayer().getUniqueId()).getName());
-		NKeconomy.removeOtherServer(event.getPlayer().getName());
+		String playerName = event.getPlayer().getName();
+		queueManager.addToQueue(new Function()
+		{
+			@Override public Object apply(Object o)
+			{
+				accountManager.getAccount(playerName).save(queueManager);
+				if(NKeconomy.managePlayerDb)
+				{
+					accountManager.removeOtherServer(playerName);
+				}
+				accountManager.delAccount(playerName);
+				return null;
+			}
+		});
 	}
 }

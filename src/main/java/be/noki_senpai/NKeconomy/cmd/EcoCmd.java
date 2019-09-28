@@ -1,5 +1,8 @@
 package be.noki_senpai.NKeconomy.cmd;
 
+import be.noki_senpai.NKeconomy.cmd.Eco.*;
+import be.noki_senpai.NKeconomy.managers.AccountManager;
+import be.noki_senpai.NKeconomy.managers.QueueManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -8,6 +11,9 @@ import be.noki_senpai.NKeconomy.NKeconomy;
 
 public class EcoCmd implements CommandExecutor
 {
+	private QueueManager queueManager = null;
+	private AccountManager accountManager = null;
+
 	public final static String usageCmdMoney = "> /eco money";
 	public final static String usageAdminCmdMoney = " " + ChatColor.BLUE + "[joueur]" + ChatColor.GREEN;
 
@@ -16,6 +22,12 @@ public class EcoCmd implements CommandExecutor
 	public final static String usageCmdTake = "> /eco take " + ChatColor.RED + "<joueur> " + ChatColor.RED + "<montant>" + ChatColor.GREEN;
 	public final static String usageCmdSet = "> /eco set " + ChatColor.RED + "<joueur> " + ChatColor.RED + "<montant>" + ChatColor.GREEN;
 	public final static String usageCmdTop = "> /eco top " + ChatColor.BLUE + "[page]" + ChatColor.GREEN;
+
+	public EcoCmd(QueueManager queueManager, AccountManager accountManager)
+	{
+		this.queueManager = queueManager;
+		this.accountManager = accountManager;
+	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String label, String[] args)
@@ -32,17 +44,17 @@ public class EcoCmd implements CommandExecutor
 		switch (args[0])
 		{
 			case "money":
-				return Money.money(sender, args);
+				return new Money(queueManager, accountManager).money(sender, args);
 			case "pay":
-				return Pay.pay(sender, args);
+				return new Pay(queueManager, accountManager).pay(sender, args);
 			case "give":
-				return Give.give(sender, args);
+				return new Give(queueManager, accountManager).give(sender, args);
 			case "take":
-				return Take.take(sender, args);
+				return new Take(queueManager, accountManager).take(sender, args);
 			case "set":
-				return Set.set(sender, args);
+				return new Set(queueManager, accountManager).set(sender, args);
 			case "top":
-				return Top.top(sender, args);
+				return new Top(queueManager, accountManager).top(sender, args);
 			default:
 				sender.sendMessage(usageCmd(sender));
 				return true;
@@ -51,7 +63,7 @@ public class EcoCmd implements CommandExecutor
 
 	public String usageCmd(CommandSender sender)
 	{
-		String usageCmd = "\n" + ChatColor.GREEN + "Liste des commandes pour " + ChatColor.RED + NKeconomy.PName + ChatColor.GREEN + "\n----------------------------------------------------";
+		String usageCmd = "\n" + ChatColor.GREEN + "Liste des commandes pour " + ChatColor.RED + NKeconomy.PNAME + ChatColor.GREEN + "\n----------------------------------------------------";
 		String cmdMoney = usageCmdMoney;
 
 		if (sender.hasPermission("*") || sender.hasPermission("nkeco.*") || sender.hasPermission("nkeco.money.other") || sender.hasPermission("nkeco.admin"))

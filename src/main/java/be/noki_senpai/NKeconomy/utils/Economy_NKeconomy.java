@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import be.noki_senpai.NKeconomy.managers.AccountManager;
+import be.noki_senpai.NKeconomy.managers.ConfigManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
@@ -25,10 +27,12 @@ public class Economy_NKeconomy extends AbstractEconomy
 	private final String name = "NKeconomy";
 	private Plugin plugin = null;
 	private NKeconomy economy = null;
+	private AccountManager accountManager = null;
 
-	public Economy_NKeconomy(Plugin plugin)
+	public Economy_NKeconomy(Plugin plugin, AccountManager accountManager)
 	{
 		this.plugin = plugin;
+		this.accountManager = accountManager;
 		Bukkit.getServer().getPluginManager().registerEvents(new EconomyServerListener(this), plugin);
 
 		if (economy == null)
@@ -111,7 +115,7 @@ public class Economy_NKeconomy extends AbstractEconomy
 
 		try
 		{
-			balance = NKeconomy.getBalance(playerName);
+			balance = accountManager.getBalance(playerName);
 		}
 		catch (Exception e)
 		{
@@ -133,7 +137,7 @@ public class Economy_NKeconomy extends AbstractEconomy
 	@Override
 	public EconomyResponse withdrawPlayer(String playerName, double amount)
 	{
-		amount = NKeconomy.round(amount);
+		amount = accountManager.round(amount);
 		if (amount < 0)
 		{
 			return new EconomyResponse(0, 0, ResponseType.FAILURE, "Cannot withdraw negative funds");
@@ -143,7 +147,7 @@ public class Economy_NKeconomy extends AbstractEconomy
 		EconomyResponse.ResponseType type;
 		String errorMessage = null;
 
-		if (NKeconomy.takeAmount(playerName, amount, false))
+		if (accountManager.takeAmount(playerName, amount, false))
 		{
 			balance = getBalance(playerName);
 			type = EconomyResponse.ResponseType.SUCCESS;
@@ -161,7 +165,7 @@ public class Economy_NKeconomy extends AbstractEconomy
 	@Override
 	public EconomyResponse depositPlayer(String playerName, double amount)
 	{
-		amount = NKeconomy.round(amount);
+		amount = accountManager.round(amount);
 		if (amount < 0)
 		{
 			return new EconomyResponse(0, 0, ResponseType.FAILURE, "Cannot desposit negative funds");
@@ -171,7 +175,7 @@ public class Economy_NKeconomy extends AbstractEconomy
 		EconomyResponse.ResponseType type;
 		String errorMessage = null;
 
-		NKeconomy.giveAmount(playerName, amount, false);
+		accountManager.giveAmount(playerName, amount, false);
 		balance = getBalance(playerName);
 		type = EconomyResponse.ResponseType.SUCCESS;
 
@@ -181,13 +185,13 @@ public class Economy_NKeconomy extends AbstractEconomy
 	@Override
 	public boolean hasAccount(String playerName)
 	{
-		return NKeconomy.hasAccount(playerName);
+		return accountManager.hasAccount(playerName);
 	}
 
 	@Override
 	public boolean has(String playerName, double amount)
 	{
-		amount = NKeconomy.round(amount);
+		amount = accountManager.round(amount);
 		if (getBalance(playerName) >= amount)
 		{
 			return true;
@@ -202,7 +206,7 @@ public class Economy_NKeconomy extends AbstractEconomy
 	@Override
 	public String format(double amount)
 	{
-		return NKeconomy.format(amount) + " " + NKeconomy.currency + ChatColor.RESET;
+		return accountManager.format(amount) + " " + ConfigManager.CURRENCY + ChatColor.RESET;
 	}
 
 	@Override

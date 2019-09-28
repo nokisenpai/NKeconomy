@@ -1,5 +1,7 @@
 package be.noki_senpai.NKeconomy.utils;
 
+import java.util.logging.Level;
+
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -10,7 +12,7 @@ public class SQLConnect
 
 	public static HikariDataSource getHikariDS()
 	{
-		if (ds.isClosed())
+		if(ds.isClosed())
 		{
 			ds = new HikariDataSource(jdbcConfig);
 		}
@@ -23,10 +25,9 @@ public class SQLConnect
 		jdbcConfig.setMaximumPoolSize(10);
 		jdbcConfig.setMinimumIdle(2);
 		jdbcConfig.setMaxLifetime(900000);
-		jdbcConfig.setJdbcUrl("jdbc:mysql://" + host_ + ":" + port_ + "/" + dbName_ + "?useSSL=false");
+		jdbcConfig.setJdbcUrl("jdbc:mysql://" + host_ + ":" + port_ + "/" + dbName_ + "?useSSL=false&autoReconnect=true&useUnicode=yes");
 		jdbcConfig.setUsername(user_);
 		jdbcConfig.setPassword(password_);
 		ds = new HikariDataSource(jdbcConfig);
 	}
-
 }
