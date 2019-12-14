@@ -51,17 +51,6 @@ public class AccountManager
 				saveAll();
 			}
 		}.runTaskTimerAsynchronously(NKeconomy.getPlugin(), 0, 300 * 20);
-
-		// Purge cross_server for this server
-		this.queueManager.addToQueue(new Function()
-		{
-			@Override public Object apply(Object o)
-			{
-				purgeCrossServer();
-				return null;
-			}
-		});
-
 	}
 
 	public void loadAccount()
@@ -688,30 +677,6 @@ public class AccountManager
 		BigDecimal bd = new BigDecimal(value);
 		bd = bd.setScale(5, RoundingMode.HALF_UP);
 		return bd.doubleValue();
-	}
-
-	// Purge cross server
-	public void purgeCrossServer()
-	{
-		Connection bdd = null;
-		PreparedStatement ps = null;
-		String req = null;
-
-		try
-		{
-			bdd = DatabaseManager.getConnection();
-
-			req = "DELETE FROM " + DatabaseManager.table.PLAYERS + " WHERE server = ?";
-			ps = bdd.prepareStatement(req);
-			ps.setString(1, ConfigManager.SERVERNAME);
-
-			ps.execute();
-			ps.close();
-		}
-		catch(SQLException e)
-		{
-			e.printStackTrace();
-		}
 	}
 
 	// Check if a player is connected in other server

@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.function.Function;
 
@@ -26,18 +27,17 @@ public class PlayerConnectionListener implements Listener
 	@EventHandler
 	public void PlayerJoinEvent(final PlayerJoinEvent event)
 	{
-		queueManager.addToQueue(new Function()
+		new BukkitRunnable()
 		{
-			@Override public Object apply(Object o)
+			@Override public void run()
 			{
 				accountManager.addAccount(event.getPlayer());
 				if(NKeconomy.managePlayerDb)
 				{
 					accountManager.addOtherServer(event.getPlayer().getName());
 				}
-				return null;
 			}
-		});
+		}.runTaskLaterAsynchronously(NKeconomy.getPlugin(), 20);
 	}
 
 	@EventHandler

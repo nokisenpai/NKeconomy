@@ -84,7 +84,7 @@ public class Account
 					// If names are differents, update in database
 					if(!tmpName.equals(getPlayerName()))
 					{
-						req = "UPDATE " + DatabaseManager.table.ACCOUNTS + " SET name = ? WHERE id = ?";
+						req = "UPDATE " + DatabaseManager.table.PLAYERS + " SET name = ? WHERE id = ?";
 						ps = bdd.prepareStatement(req);
 						ps.setString(1, getPlayerName());
 						ps.setInt(2, getId());
@@ -99,20 +99,24 @@ public class Account
 			else
 			{
 				//Add new player on database
-				req = "INSERT INTO " + DatabaseManager.table.PLAYERS + " ( uuid, name) VALUES ( ? , ? ) ON DUPLICATE KEY UPDATE id = id";
+				ps.close();
+				resultat.close();
+
+				req = "INSERT INTO " + DatabaseManager.table.PLAYERS + " ( uuid, name ) VALUES ( ? , ? ) ON DUPLICATE KEY UPDATE id = id";
 				ps = bdd.prepareStatement(req, Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, getPlayerUUID().toString());
 				ps.setString(2, getPlayerName());
 				ps.executeUpdate();
 				resultat = ps.getGeneratedKeys();
 
-				resultat.next();
-				setId(resultat.getInt(1));
+				if(resultat.next())
+				{
+					setId(resultat.getInt(1));
+				}
 
 				ps.close();
 				resultat.close();
 
-				//Add new account on database
 				//Add new account on database
 				req = "INSERT INTO " + DatabaseManager.table.ACCOUNTS + " ( player_id, amount ) VALUES ( ? , ? )";
 				ps = bdd.prepareStatement(req, Statement.RETURN_GENERATED_KEYS);
