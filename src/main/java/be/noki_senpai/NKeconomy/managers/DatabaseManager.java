@@ -23,9 +23,33 @@ public class DatabaseManager
 		this.configManager = configManager;
 	}
 
+	public enum common
+	{
+		PLAYERS("NK_players"),
+		SERVERS("NK_servers"),
+		WORLDS("NK_worlds");
+
+		private String name = "";
+
+		common(String name)
+		{
+			this.name = name;
+		}
+
+		public String toString()
+		{
+			return name;
+		}
+
+		public static int size()
+		{
+			return common.values().length;
+		}
+	}
+
 	public enum table
 	{
-		ACCOUNTS(ConfigManager.PREFIX + "accounts"), PLAYERS("NK_players");
+		ACCOUNTS(ConfigManager.PREFIX + "accounts");
 
 		private String name = "";
 
@@ -41,7 +65,7 @@ public class DatabaseManager
 
 		public static int size()
 		{
-			return 2;
+			return table.values().length;
 		}
 	}
 
@@ -124,14 +148,6 @@ public class DatabaseManager
 			resultat.close();
 			ps.close();
 
-			req = "SHOW TABLES FROM " + configManager.getDbName() + " LIKE 'NK_cross_server'";
-			ps = bdd.prepareStatement(req);
-			resultat = ps.executeQuery();
-			if(resultat.next())
-			{
-				count++;
-			}
-
 			// if 1 or more tables are missing
 			if(count < table.size())
 			{
@@ -144,17 +160,6 @@ public class DatabaseManager
 		{
 			console.sendMessage(ChatColor.DARK_RED + NKeconomy.PNAME + " Error while testing existance of tables. (Error#main.Storage.003)");
 			NKeconomy.getPlugin().disablePlugin();
-		}
-		finally
-		{
-			if(ps != null)
-			{
-				ps.close();
-			}
-			if(resultat != null)
-			{
-				resultat.close();
-			}
 		}
 
 		return true;
@@ -173,18 +178,12 @@ public class DatabaseManager
 
 			try
 			{
-				// Creating players table
-				req = "CREATE TABLE IF NOT EXISTS `" + table.PLAYERS + "` (`id` int(11) NOT NULL AUTO_INCREMENT,"
-						+ "`uuid` varchar(40) NOT NULL,`name` varchar(40) NOT NULL,`server` varchar(40) ,PRIMARY KEY (`id`),"
-						+ "UNIQUE KEY `uuid_unique` (`uuid`) USING BTREE) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
-				s = bdd.createStatement();
-				s.execute(req);
-				s.close();
-
 				// Creating accounts table
-				req = "CREATE TABLE IF NOT EXISTS `" + table.ACCOUNTS + "` (`id` int(11) NOT NULL AUTO_INCREMENT,"
-						+ "`player_id` int(11) NOT NULL,`amount` double NOT NULL,PRIMARY KEY (`id`),"
-						+ "UNIQUE KEY `uuid_unique` (`uuid`) USING BTREE) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+				req = "CREATE TABLE IF NOT EXISTS `" + table.ACCOUNTS + "` ("
+						+ "`id` int(11) NOT NULL AUTO_INCREMENT,"
+						+ "`player_id` int(11) NOT NULL,"
+						+ "`amount` double NOT NULL,"
+						+ "PRIMARY KEY (`id`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
 				s = bdd.createStatement();
 				s.execute(req);
 				s.close();

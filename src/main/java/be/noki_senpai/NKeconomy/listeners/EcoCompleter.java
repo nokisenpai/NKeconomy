@@ -19,11 +19,10 @@ public class EcoCompleter implements TabCompleter
 		if (args.length == 1)
 		{
 			final List<String> completions = new ArrayList<>();
-			// copy matches of first argument from list (ex: if first arg is 'm' will return
-			// just 'minecraft')
+
 			org.bukkit.util.StringUtil.copyPartialMatches(args[0], COMMANDS, completions);
-			// sort the list
 			Collections.sort(completions);
+
 			return completions;
 		}
 		return null;

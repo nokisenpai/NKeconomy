@@ -32,10 +32,6 @@ public class PlayerConnectionListener implements Listener
 			@Override public void run()
 			{
 				accountManager.addAccount(event.getPlayer());
-				if(NKeconomy.managePlayerDb)
-				{
-					accountManager.addOtherServer(event.getPlayer().getName());
-				}
 			}
 		}.runTaskLaterAsynchronously(NKeconomy.getPlugin(), 20);
 	}
@@ -49,10 +45,6 @@ public class PlayerConnectionListener implements Listener
 			@Override public Object apply(Object o)
 			{
 				accountManager.getAccount(playerName).save(queueManager);
-				if(NKeconomy.managePlayerDb)
-				{
-					accountManager.removeOtherServer(playerName);
-				}
 				accountManager.delAccount(playerName);
 				return null;
 			}

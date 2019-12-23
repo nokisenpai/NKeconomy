@@ -52,7 +52,6 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 	private ConsoleCommandSender console = null;
 	private static NKeconomy plugin;
 	private static Economy economy = null;
-	public static boolean managePlayerDb = true;
 
 	// Fired when plugin is first enabled
 	@Override public void onEnable()
@@ -63,6 +62,13 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 
 		console = Bukkit.getConsoleSender();
 		manager = new Manager(this);
+
+		if(!checkNKmanager())
+		{
+			console.sendMessage(ChatColor.DARK_RED + PNAME + " NKmanager in not enabled !");
+			disablePlugin();
+			return;
+		}
 
 		// Link with Vault
 		if(!setupEconomy())
@@ -209,5 +215,14 @@ public class NKeconomy extends JavaPlugin implements PluginMessageListener
 		Bukkit.getOnlinePlayers().forEach((player) -> {
 			player.kickPlayer("Le serveur redémarre.");
 		});
+	}
+
+	// ######################################
+	// Check if NKmanager is enabled
+	// ######################################
+
+	public boolean checkNKmanager()
+	{
+		return getServer().getPluginManager().getPlugin("NKmanager").isEnabled();
 	}
 }
