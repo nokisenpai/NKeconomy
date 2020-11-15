@@ -121,7 +121,7 @@ public class Economy_NKeconomy extends AbstractEconomy
 		{
 			balance = 0;
 		}
-
+		//log.info("[NKeco] - Un plugin demande la somme que possède le joueur '" + playerName + "'. Réponse : " + balance);
 		return balance;
 	}
 
@@ -140,10 +140,13 @@ public class Economy_NKeconomy extends AbstractEconomy
 		amount = accountManager.round(amount);
 		if (amount < 0)
 		{
+			log.info("[NKeco] - Un plugin veut retirer de l'argent au joueur '" + playerName + "'. La valeur à retirer est de : " + amount + " . \n"
+					+ "Réponse : Impossible de retirer une valeur négative.");
 			return new EconomyResponse(0, 0, ResponseType.FAILURE, "Cannot withdraw negative funds");
 		}
 
 		double balance;
+		double oldBalance = balance = getBalance(playerName);
 		EconomyResponse.ResponseType type;
 		String errorMessage = null;
 
@@ -151,12 +154,16 @@ public class Economy_NKeconomy extends AbstractEconomy
 		{
 			balance = getBalance(playerName);
 			type = EconomyResponse.ResponseType.SUCCESS;
+			log.info("[NKeco] - Un plugin veut retirer de l'argent au joueur '" + playerName + "'. La valeur à retirer est de : " + amount + " . \n"
+					+ "Réponse : Le retrait s'est bien effectuée. Le joueur possédait : " + oldBalance + " . Il possède maintenant : " + balance);
 		}
 		else
 		{
 			balance = 0;
 			amount = 0;
 			type = EconomyResponse.ResponseType.FAILURE;
+			log.info("[NKeco] - Un plugin veut retirer de l'argent au joueur '" + playerName + "'. La valeur à retirer est de : " + amount + " . \n"
+					+ "Réponse : Le joueur n'a pas assez d'argent.");
 		}
 
 		return new EconomyResponse(amount, balance, type, errorMessage);
@@ -168,16 +175,22 @@ public class Economy_NKeconomy extends AbstractEconomy
 		amount = accountManager.round(amount);
 		if (amount < 0)
 		{
+			log.info("[NKeco] - Un plugin veut ajouter de l'argent au joueur '" + playerName + "'. La valeur à ajouter est de : " + amount + " . \n"
+					+ "Réponse : Impossible d'ajouter une valeur négative.");
 			return new EconomyResponse(0, 0, ResponseType.FAILURE, "Cannot desposit negative funds");
 		}
 
 		double balance;
+		double oldBalance = balance = getBalance(playerName);
 		EconomyResponse.ResponseType type;
 		String errorMessage = null;
 
 		accountManager.giveAmount(playerName, amount, false);
 		balance = getBalance(playerName);
 		type = EconomyResponse.ResponseType.SUCCESS;
+
+		log.info("[NKeco] - Un plugin veut ajouter de l'argent au joueur '" + playerName + "'. La valeur à ajouter est de : " + amount + " . \n"
+				+ "Réponse : L'ajout s'est bien effectuée. Le joueur possédait : " + oldBalance + " . Il possède maintenant : " + balance);
 
 		return new EconomyResponse(amount, balance, type, errorMessage);
 	}
@@ -194,8 +207,12 @@ public class Economy_NKeconomy extends AbstractEconomy
 		amount = accountManager.round(amount);
 		if (getBalance(playerName) >= amount)
 		{
+			log.info("[NKeco] - Un plugin veut savoir si le joueur '" + playerName + "' possède la somme de : " + amount + " . \n"
+					+ "Réponse : Oui");
 			return true;
 		}
+		log.info("[NKeco] - Un plugin veut savoir si le joueur '" + playerName + "' possède la somme de : " + amount + " . \n"
+				+ "Réponse : Non");
 		return false;
 	}
 

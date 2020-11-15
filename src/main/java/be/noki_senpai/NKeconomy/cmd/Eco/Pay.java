@@ -52,6 +52,11 @@ public class Pay
 				{
 					if (CheckType.isNumber(args[2]))
 					{
+						if(Double.parseDouble(args[2]) < 0)
+						{
+							sender.sendMessage(ChatColor.RED + "Le montant doit être plus grand que 0 !");
+							return true;
+						}
 						queueManager.addToQueue(new Function()
 						{
 							@Override public Object apply(Object o)
