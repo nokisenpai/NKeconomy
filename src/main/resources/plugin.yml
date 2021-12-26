@@ -1,12 +1,15 @@
-name: NKeconomy
-main: be.noki_senpai.NKeconomy.NKeconomy
-version: 1.4.5
-api-version: 1.14
+name: ${project.name}
+main: ovh.lumen.${project.name}.Main
+version: ${project.version}
+api-version: 1.18
 author: 'NoKi_senpai'
 description: 'Allows you to have money account'
 website: www.lumen.ovh
-depend: [Vault, NKmanager]
+depend: [Vault, NKcore]
 commands:
+  ${project.name}:
+    description: "The root plugin command"
+    usage: /<command> [subcommand]
   eco:
     description: "Manages the server economy."
     usage: /<command> <money|pay|top|give|take|set>
