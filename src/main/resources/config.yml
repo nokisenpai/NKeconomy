@@ -1,15 +1,23 @@
 # NKeconomy
 
-# MySQL connection (required)
-use-mysql: false
+# MySQL connection
+# Get database access automatically using NKcore API
+use-nkcore-access: true
+
+# Used if use-nkcore-access is set to false. You can connect to another database.
 table-prefix: NKeco_
 host: localhost
 port: 3306
 dbName: minecraft_dev
 user: root
-password: 
+password:
 
-# Options
-server-name: 'world'
+# Possible values : DEBUG, LOG, WARN, ERROR
+log-level: LOG
+
 start-amount: 100
-currency: Lumi
+
+# You can use colors with '&' char
+currency: '€'
+
+enable-cross-server: true
